@@ -63,7 +63,47 @@
 
 = NHẬN DIỆN HÀNG HOÁ BÁN LẺ
 
-AMAZON GO
+== Giới thiệu
+Nhận diện hàng hoá bán lẻ là quá trình ứng dụng Thị giác máy tính để tự động xác định, phân loại và theo dõi sản phẩm trong các siêu thị, cửa hàng.
+
+Ví dụ là Amazon Go, mô hình cửa hàng không thu ngân, ứng dụng nhiều công nghệ hiện đại để nhận diện người dùng, tính tiền tự động theo đơn hàng.
+
+== Phát biểu bài toán 
+Đầu vào: 
+- Ảnh hoặc Video của sản phẩm
+- Ảnh hoặc Video của kệ hàng
+
+Đầu ra: Thông tin sản phẩm, bao gồm vị trí trên kệ, tên sản phẩm, giá cả, hạn sử dụng, v.v.
+
+== Phương pháp
+=== Truyền thống
+1. Template Matching: So khớp đặc trưng là một phương pháp để truy tìm vùng ảnh có chứa đặc điểm hoặc vật thể cụ thể bằng cách so sánh những đặc điểm của ảnh đầu vào với ảnh mục tiêu.
+
+Nhược điểm: Không chống chọi được với phép biến đổi, tức là nếu hình ảnh bị xoay ngang, dọc, chéo, phóng to,
+thu nhỏ thì cũng không thể nhận dạng được sản phẩm. Nếu vật bị che khuất thì phương pháp này cũng
+hoạt động kém.
+
+Phương pháp này không phù hợp với bán lẻ.
+
+2. Đặc trưng SIFT (Scale-Invariant Feature Transform): Phương pháp này dựa vào trích xuất đặc trưng, chuyên xác định những điểm đặc trưng (keypoint) không bị ảnh hưởng khi phóng to, thu nhỏ, xoay, cũng như biến đổi affine.
+Phương pháp này có 4 bước chính:
+  - Phát hiện các điểm đặc trưng trong không gian
+  - Định vị điểm đặc trưng (Keypoint Localization)
+  - Gán hướng (Orientation Assignment)
+  - Tạo mô tả về đặc trưng (Keypoint Descriptor)
+Ưu điểm:
+  - Bất biến 1 phần trước phép quay, độ sáng, góc nhìn
+  - Có thể hoạt động cả khi bị che khuất một phần
+Nhược điểm:
+  - Độ phức tạp tính toán cao
+  - Hoạt động kém với sản phẩm có ít đặc trưng
+
+
+== Nhận xét
+- Nhóm vẫn chưa phát biểu được về cách thức phân loại trong những tình huống cụ thể, như phân biệt các sản phẩm cùng loại, khác nhãn hiệu (Coca-Cola với Pepsi, Sữa Vinamilk và sữa TH, ...)
+- Trong phần 2, nhóm không nêu rõ được mình sẽ mục tiêu thực hiện của công trình là gì,  
+
+
 
 (cần xếp thành category, cần có những tác vụ gì)
 
@@ -106,7 +146,6 @@ Input: một đoạn video từ camera hành trình / camera an ninh
 Output: Xác suất xảy ra tai nạn trong frame đang xét
 
 Threshold: Một ngưỡng cảnh báo mức độ nguy hiểm
-
 
 
 - MEDAVET: Traffic Vehicle Anomaly Detection Mechanism based on
@@ -166,3 +205,45 @@ hàm lỗi là độ
 - Hierarchical volume sampling
 - coorse network vs fine network: không hiểu
 - Hàm lỗi của mô hình: 
+
+= BONE DISEASE VQA BASED ON MULTIMODAL TRANSFORMER
+
+
+== Phương pháp
+Decoder:
+- Decoder giải mã và tìm cách liên kết với encoder
+
+Encoder:
+- Ảnh chụp y khoa được đưa vào Vision Encoder là SWIN
+- Câu hỏi của bác sĩ được đưa vào Text Encoder là ViHealthBERT
+- Kết quả của 2 encoder được đưa vào Fusion, gọi là CMAN.
+- Chuyển tiếp qua Decoder có Learnable Answer
+- MLP: có Sigmoid, Cross Entropy, AdamW (có weight decay để tránh làm ảnh hưởng đến Gradient khi loss thay đổi nhiều)
+- Output là Class ID.
+
+Vấn đề là cơ chế Generation tốn quá nhiều tài nguyên, nên chọn cơ chế Classification.
+
+Dataset kết hợp hình ảnh xét nghiệm và 
+
+Training:
+- Giai đoạn 1: Train 6 epoch, trọng số không đổi
+- Giai đoạn 2: Train 3 epoch, có cho thay đổi trọng số
+Thời gian train là cho cả 2 giai đoạn là hơn 10 tiếng.
+
+$arrow.r.double$  
+== Nhận xét
+- Cần chắt lọc dữ liệu lại, nếu dữ liệu y khoa quá lớn
+- Cần tự bổ sung thêm dữ liệu bằng cách đặt câu hỏi tương ứng.
+- Nên sắp xếp câu hỏi theo category: What?, Where?
+- Chưa giải thích rõ được cách đưa dữ liệu học vào mô hình: tức là 1 bảng, các cột là hình ảnh - câu hỏi - câu trả lời. Việc đưa raw data vào mô hình là vô lý.
+- Cần trình bày câu hỏi, kết quả theo từng nhóm bệnh 
+
+= ĐIỂM DANH LỚP HỌC VÀ ĐÁNH GIÁ ĐƯỜNG CONG THÁI ĐỘ HỌC TẬP
+
+== Phương pháp:
+
+
+== Nhận xét:
+- Phương pháp sẽ chạy chậm vì áp dụng quá nhiều tác vụ khác nhau, gây tốn kém không cần thiết.
+- Cách làm tương đối tốt, nhưng trình bày khó hiểu
+- 

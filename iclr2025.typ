@@ -255,10 +255,11 @@
       line(length: 100%, stroke: 0.4pt)
     },
     footer-descent: 23.5pt, // Visually perfect.
-    footer: locate(loc => {
-      let ix = counter(page).at(loc).first()
-      return align(center, text(size: font-size.normal, [#ix]))
-    }),
+    numbering: "1"
+    // footer: locate(loc => {
+    //   let ix = counter(page).at(loc).first()
+    //   return align(center, text(size: font-size.normal, [#ix]))
+    // }),
   )
 
   set text(font: font-family, size: font-size.normal)
