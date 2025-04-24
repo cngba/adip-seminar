@@ -141,37 +141,33 @@ tại 1 frame bất kỳ, có 2 trường hợp: 1 là đối tượng đang the
 
 = Phát hiện bất thường trong giao thông
 
-Input: một đoạn video từ camera hành trình / camera an ninh
+== Phát biểu bài toán
+- Input: một đoạn video từ camera hành trình / camera an ninh
+- Output: Xác suất xảy ra tai nạn trong frame đang xét
+- Threshold: Một ngưỡng cảnh báo mức độ nguy hiểm
 
-Output: Xác suất xảy ra tai nạn trong frame đang xét
-
-Threshold: Một ngưỡng cảnh báo mức độ nguy hiểm
-
-
-- MEDAVET: Traffic Vehicle Anomaly Detection Mechanism based on
+== Phương pháp
+MEDAVET: Traffic Vehicle Anomaly Detection Mechanism based on
 spatial and temporal structures in vehicle traffic
+- Dùng YOLOv7 để phát hiện đối tượng xe và dùng đồ thị nhằm theo dõi hành trình của các phương tiện thông qua khung hình của video.
+- Sử dụng cấu trúc dữ liệu QuadTree để tổ chức không gian và phân tích hành vi của xe
+== Nhận xét
+- Chưa giải thích được cơ chế tìm chiều di chuyển và vận tốc của phương tiện
+- Cần nói rõ ý chung trước khi đi sâu vào những biểu đồ và thuật toán, tuy có rất nhiều những neural network nhưng việc giải thích chưa đáng kể
+- Xét dữ liệu không gian - thời gian (spatial - temporal) là một thách thức cần được nêu
+- Cần hiểu "Thế nào là tai nạn?", như vậy mới xác định được chính xác thời điểm yêu cầu hệ thống hoạt động.
+- Đối với mỗi frame, cần quan tâm đến object nào để tính toán ra xác suất?
 
+$arrow.r$ liệt kê 11 vật thể nó quan tâm:
 
-- chưa giải thích được cơ chế tìm chiều di chuyển và vận tốc của phương tiện
-
-- cần nói rõ ý chung trước khi đi sâu vào những biểu đồ và thuật toán, tuy có rất nhiều những neural network nhưng việc giải thích chưa đáng kể
-
-- trong khung cảnh mà camera bắt được, 
-- dữ liệu không gian - thời gian (spetial - temporal)
-cần hiểu "thế nào là tai nạn"
-
-- đối với mỗi frame, cần quan tâm đến object nào để tính toán ra xác suất?
-
-$-->$ liệt kê 11 vật thể nó quan tâm:
-
-- từ hình ảnh, rút ra đối tượng ra sao, từ đối tượng rút ra xác suất thế nào
-
+- từ hình ảnh, rút ra đối tượng ra sao, từ đối tượng rút ra xác suất thế nào?
 - tại sao khi sắp có tai nạn thì xác suất được tăng lên?
 Dùng YOLOv7 để phát hiện
 
 - Dữ liệu đến từ những xe đã bị tai nạn, nhưng công tác gán nhãn diễn ra thế nào?
 
-
+=== Nhận xét
+/*
 = GRAPH OCR
 Nhận diện đồ thị bằng OCR
 
@@ -179,7 +175,7 @@ Nhận diện đồ thị bằng OCR
 - chưa sử dụng đồ thị viết tay
 - 
 có những luận văn làm rất tốt, nhưng chatgpt có thể thừa sức đánh bại luận văn đó, gây điểm thấp
-
+*/
 = View Synthesis using NeRF
 Tổng hợp góc nhìn
 
@@ -207,7 +203,6 @@ hàm lỗi là độ
 - Hàm lỗi của mô hình: 
 
 = BONE DISEASE VQA BASED ON MULTIMODAL TRANSFORMER
-
 
 == Phương pháp
 Decoder:
@@ -239,11 +234,100 @@ $arrow.r.double$
 - Cần trình bày câu hỏi, kết quả theo từng nhóm bệnh 
 
 = ĐIỂM DANH LỚP HỌC VÀ ĐÁNH GIÁ ĐƯỜNG CONG THÁI ĐỘ HỌC TẬP
+Tên ứng dụng: Giám sát thái độ học tập của sinh viên
+== Phát biểu bài toán
+Mục tiêu:
+- Tự động hoá điểm danh
+- Đánh giá thái độ học tập sinh viên, qua đó hiệu chỉnh kịp thời nội dung giảng dạy và phát hiện học sinh cá biệt.
+
+Đầu vào: Dãy ảnh, video lớp học, từ camera. 
+Đầu ra: 
+- Bảng điểm danh tự động 
+- Đường cong thái độ học tập của từng sinh viên và của cả lớp. Đường cong này cũng được lưu giữ để phân tích xu hướng.  
+- Nguyên nhân tiêu cực
 
 == Phương pháp:
+=== Phương pháp xây dựng phần mềm
+=== Công tác làm dữ liệu
+Dữ liệu được thu thập từ 
+=== Sơ đồ chung hệ thống
+=== Face Detection
+=== Face Recognition
+=== Face Emotion Recognition
+// Từ những gì bạn ghi được, chúng tôi có thể tái hiện (reproduceablity
+=== Action Reception
 
+// Cần nêu rõ input, output, dữ liệu
 
 == Nhận xét:
 - Phương pháp sẽ chạy chậm vì áp dụng quá nhiều tác vụ khác nhau, gây tốn kém không cần thiết.
 - Cách làm tương đối tốt, nhưng trình bày khó hiểu
-- 
+
+= ĐỊNH VỊ VÀ TÁI TẠO MÔI TRƯỜNG XUNG QUANH
+== Phát biểu bài toán
+Đầu vào: Hình ảnh từ Camera RGB-D
+Đầu ra: Mạng lưới 
+
+// = Xây dựng hệ thống tính chỉ số hấp thụ các bon từ cây trồng dựa vào Thị giác máy tính và Trí tuệ nhân tạo
+= XÂY DỰNG HỆ THỐNG TÍNH CHỈ SỐ HẤP THỤ CÁC BON TỪ CÂY TRỒNG
+Carbon index (Chỉ số các-bon) là một thước đo dùng để đánh giá khả năng hâp thụ và lưu trữ CO2 của cây trồng hoặc hệ sinh thái.
+== Ý nghĩa khoa học
+- Định lượng CO2 hấp thụ từ cây trồng tạo điều kiện nghiên cứu về môi trường và biến đổi khí hậu
+- Hỗ trợ cho nghiên cứu của các lĩnh vực sinh học và tài nguyên - môi TRƯỜNG
+== Ý nghĩa ứng dụng
+- Phục vụ quản lý tài nguyên và môi trường rừng
+- Cơ sở xây dựng chính sách về bảo vệ môi trường và chống biến đổi khí hậu
+- Công cụ chính yếu cho thị trường tín chỉ các bon 
+$arrow.r.double$ Một phần không thể thiếu trong bảo vệ môi trường
+== Phát biểu bài toán
+Đầu vào:
+- Dữ liệu quang học: Ảnh RGB, ảnh đa phổ, ảnh siêu phổ
+- Dữ liệu cao độ: LiDAR, GEDI, Photogrammetry
+- Dữ liệu kiểm chứng: Các kết quả nghiên cứu có sẵn, Sinh khối thực tế, DBH thực tế
+Đầu ra:
+- Bản đồ Carbon Density: Dữ liệu raster hiển thị mật độ carbon trên toàn bộ khu vực rừng
+- Bảng số liệu thống kê tổng hợp mật độ carbon theo khu vực
+- Dữ liệu tích hợp GIS
+
+Các công đoạn chính:
++ Tiền xử lý dữ liệu: Tải và xử lý, chuẩn hoá dữ liệu ảnh Sentinel-2.
++ Xử lý, trích xuất đặc trưng từ ảnh vệ tinh: Tính NDVI để xác định vùng rừng
++ Dự đoán mật độ các bon với mô hình AI
++ Xuất kết quả & phân tích: Tạo bản đồ Carbon Density, tạo báo cáo về mật độ các bon, so sánh kết quả với dữ liệu kiểm chứng
+
+Đóng góp:
+Phát triển hệ thống tính toán tự động, cung cấp dữ liệu chính xác cho nghiên cứu và ứng dụng thực tế.
+- Tăng độ chính xác trong việc ước tính lượng các-bon lưu trữ.
+- Giảm chi phí và thời gian so với các phương pháp truyền thống.
+- Phát hiện nhanh chóng các thay đổi trong diện tích rừng, đặc biệt là do phá rừng để nhanh chóng thông báo và xử lý
+
+== Công trình nghiên cứu liên quan
+=== Giai đoạn truyền thống
+Đây là giai đoạn diễn ra vào những năm 1980 - 2000, tập trung vào kiểm kê rừng và công thức sinh khối
+
+Phương pháp sinh khối toàn cây:
+- Sử dụng phương trình toán học để tính toán biomass từ đường kính thân cây
+- Thực hiện hồi quy tuyến tính từ khảo sát thực địa
+- Ưu điểm: Dễ thực hiện
+- Nhược điểm: Tốn nhiều công sức, và hiệu quả phụ thuộc vào dữ liệu thực địa
+
+Phương pháp đánh giá bằng ô tiêu chuẩn
+- Đo đạc thực tế qua các ô tiêu chuẩn, sau đó nội suy cho toàn khu vực
+- Thống kê từ khảo sát thực địa
+- Ưu điểm: Phù hợp với diện tích nhỏ, độ chính xác cao
+- Nhược điểm: Chỉ phù hợp nếu thu thập dữ liệu rộng và đầy đủ
+
+=== Giai đoạn viễn thám truyền thống (2000s - 2015)
+Tóm tắt:
+- Dữ liệu ảnh vệ tinh (MODIS, Landsat) giúp mở rộng quy mô tính toán carbon.
+- Radar SAR khắc phục được nhược điểm mây che, nhưng xử lý phức tạp.
+- LiDAR cho kết quả chính xác nhất, nhưng chi phí cao.
+- Ưu điểm: Khả năng tính toán trên diện rộng, không cần khảo sát thực địa nhiều.
+- Nhược điểm: Các mô hình còn đơn giản (hồi quy tuyên tính), chưa tận dụng AI
+
+Phương pháp Chỉ số thực vật NDVI:
+- Sử dụng chỉ số thực vật NDVI từ ảnh vệ tinh để ước tính ảnh sinh khối
+- Phương pháp: Hồi quy tuyến tính NDVI
+- Sử dụng Dataset Landsat 5/7
+- Ưu điểm: Dễ áp dụng, không cần khảo sát thực địa
+- Nhược điểm: Độ chính xác thấp ở rừng nhiệt đới, bị ảnh hưởng bởi đất trống.
