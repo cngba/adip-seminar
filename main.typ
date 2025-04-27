@@ -12,11 +12,6 @@
  */
 #let authors = (
   (
-    names: ([Lưu Nam Đạt], ),
-    affilation: [ 22127062 ],
-    email: "lndat22@clc.fitus.edu.vn",
-  ),
-  (
     names: ([Nguyễn Bá Công], ),
     affilation: [  22127046 ],
     email: "nbcong22@clc.fitus.edu.vn",
@@ -38,7 +33,7 @@
   authors: authors,
   keywords: (),
   abstract: [
-    None
+    Bài báo cáo này là kết quả của các phần làm việc trong đồ án môn học và đã được trình bày trong buổi seminar của lớp. Báo cáo tổng hợp các nghiên cứu, phân tích và kết quả đạt được từ các hoạt động nhóm và cá nhân liên quan đến nội dung môn học. Qua đó, báo cáo không chỉ thể hiện sự hiểu biết về các vấn đề lý thuyết mà còn ứng dụng vào thực tiễn, giúp làm rõ các khái niệm và kỹ thuật đã học. Bài trình bày seminar đã tạo cơ hội cho việc trao đổi ý tưởng và nhận phản hồi từ giảng viên và bạn bè, từ đó nâng cao khả năng thảo luận và áp dụng kiến thức vào các tình huống thực tế.
   ],
   bibliography: bibliography("biblio.bib"),
   appendix: [
@@ -163,6 +158,40 @@ Object Regressor (Nhánh hồi quy toạ độ):
 // Detection
 
 = HỆ THỐNG TRUY VẾT ĐỐI TƯỢNG DỰA VÀO CÂU MÔ TẢ
+
+== Bối Cảnh Chung <bối-cảnh-chung>
+Hệ thống truy vết đối tượng dựa vào câu mô tả là một nhiệm vụ quan trọng trong lĩnh vực xử lý ảnh và video, đặc biệt trong các ứng dụng như xe tự hành, giao thông và an ninh. Việc theo dõi đối tượng trong môi trường phức tạp đối diện với các thách thức như:
+
+- Hạn chế ngôn ngữ mô tả
+
+- Phân biệt đối tượng mục tiêu
+
+- Truy vết trong điều kiện thay đổi môi trường và góc nhìn.
+
+== Phát Biểu Bài Toán <phát-biểu-bài-toán>
+Vấn đề chính của hệ thống là phát hiện và theo dõi đối tượng trong video dựa trên các mô tả ngữ nghĩa. Mô hình phải có khả năng xử lý cả thông tin hình ảnh và ngữ nghĩa, đảm bảo việc truy vết chính xác dù đối tượng có thay đổi hoặc biến mất trong một số frame.
+
+== Các Công Trình Liên Quan <các-công-trình-liên-quan>
+=== TP-GMOT: Tracking Generic Multiple Object by Textual Prompt with Motion Appearance Cost SORT <tp-gmot-tracking-generic-multiple-object-by-textual-prompt-with-motion-appearance-cost-sort>
+Phương pháp TP-GMOT sử dụng mô tả văn bản và tính toán chi phí chuyển động để theo dõi đối tượng đa dạng trong video.
+
+=== DTLLM-VLT: <dtllm-vlt>
+Tại một frame bất kỳ trong video, có thể gặp hai trường hợp quan trọng: một là đối tượng bị biến mất, hai là đối tượng xuất hiện trở lại. Trong cả hai trường hợp, câu mô tả phải đóng vai trò quan trọng trong việc giúp mô hình nhận diện và theo dõi đối tượng.
+
+== Kiến Trúc Mô Hình <kiến-trúc-mô-hình>
+Mô hình tổng thể của hệ thống bao gồm:
+
+- #strong[Multi-Modal Alignment Module];: Sử dụng phương pháp Cross-Modal Alignment Loss (CMA) để căn chỉnh đặc trưng giữa ngôn ngữ và hình ảnh.
+
+- #strong[All-in-One Transformer Backbone];: Kết hợp đặc trưng hình ảnh và ngôn ngữ qua Modal Mixup và sử dụng các lớp Transformer để học mối quan hệ giữa chúng.
+
+- #strong[Tracking Head];: Bao gồm hai nhánh phân loại và hồi quy, giúp dự đoán vị trí và kích thước của đối tượng.
+
+== Kết Quả và Đánh Giá <kết-quả-và-đánh-giá>
+Hệ thống đã được huấn luyện và kiểm thử trên các bộ dữ liệu như LaSOT và WebUAV-3M. Các kết quả cho thấy mô hình đạt hiệu suất cao, đặc biệt trong việc xử lý các tác động từ lời nhắc ngôn ngữ mơ hồ. Các thí nghiệm cho thấy rằng phương pháp All-in-One giúp cải thiện độ chính xác trong việc theo dõi đối tượng trong các tình huống phức tạp.
+
+== Kết Luận <kết-luận>
+Mô hình All-in-One Transformer kết hợp ngôn ngữ và hình ảnh một cách hiệu quả, đạt được kết quả vượt trội trong việc theo dõi đối tượng. Tuy nhiên, cần cải thiện khả năng xử lý các lời nhắc ngôn ngữ không chính xác hoặc mơ hồ để tăng cường tính chính xác và linh hoạt của hệ thống.
 
 1. GIỚI THIỆU
 1.1. BỐI CẢNH CHUNG
