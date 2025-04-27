@@ -221,70 +221,49 @@ Mô hình All-in-One Transformer kết hợp ngôn ngữ và hình ảnh một c
 
 = PHÁT HIỆN BẤT THƯỜNG TRONG GIAO Thông
 
-== Phát biểu bài toán
-_Đầu vào:_ Một đoạn video từ camera hành trình / camera an ninh
-_Đầu ra:_ Xác suất xảy ra tai nạn trong frame đang xét
+== Phát Biểu Bài Toán <phát-biểu-bài-toán>
+=== Mục Tiêu <mục-tiêu>
+Bài toán đặt ra là phát hiện các bất thường trong giao thông bằng cách phân tích video từ camera hành trình hoặc camera an ninh. Hệ thống mục tiêu là tính toán xác suất xảy ra tai nạn tại mỗi frame của video và cảnh báo mức độ nguy hiểm nếu vượt qua ngưỡng định trước. Việc xác định tai nạn và cảnh báo kịp thời là quan trọng để nâng cao hiệu quả giám sát và giảm thiểu tai nạn giao thông.
 
-Có xét Threshold là một ngưỡng cảnh báo mức độ nguy hiểm
+=== Đầu Vào và Đầu Ra <đầu-vào-và-đầu-ra>
+#strong[Đầu vào];: Một đoạn video thu từ camera hành trình hoặc camera an ninh.
 
-== Phương pháp
-MEDAVET: Traffic Vehicle Anomaly Detection Mechanism based on
-spatial and temporal structures in vehicle traffic
-- Dùng YOLOv7 để phát hiện đối tượng xe và dùng đồ thị nhằm theo dõi hành trình của các phương tiện thông qua khung hình của video.
-- Sử dụng cấu trúc dữ liệu QuadTree để tổ chức không gian và phân tích hành vi của xe
-== Nhận xét
-- Chưa giải thích được cơ chế tìm chiều di chuyển và vận tốc của phương tiện
-- Cần nói rõ ý chung trước khi đi sâu vào những biểu đồ và thuật toán, tuy có rất nhiều những neural network nhưng việc giải thích chưa đáng kể
-- Xét dữ liệu không gian - thời gian (spatial - temporal) là một thách thức cần được nêu
-- Cần hiểu "Thế nào là tai nạn?", như vậy mới xác định được chính xác thời điểm yêu cầu hệ thống hoạt động.
-- Đối với mỗi frame, cần quan tâm đến object nào để tính toán ra xác suất?
+- Video ghi lại cảnh giao thông từ một hoặc nhiều camera.
 
-$arrow.r$ liệt kê 11 vật thể nó quan tâm:
+- Dữ liệu từ các khung hình video, bao gồm hình ảnh và chuyển động của các phương tiện.
 
-- từ hình ảnh, rút ra đối tượng ra sao, từ đối tượng rút ra xác suất thế nào?
-- tại sao khi sắp có tai nạn thì xác suất được tăng lên?
-Dùng YOLOv7 để phát hiện
+#strong[Đầu ra];:
 
-- Dữ liệu đến từ những xe đã bị tai nạn, nhưng công tác gán nhãn diễn ra thế nào?
+- Xác suất tai nạn trong mỗi frame của video.
 
-=== Nhận xét
-/*
-= GRAPH OCR
-Nhận diện đồ thị bằng OCR
+- Cảnh báo nếu xác suất vượt qua ngưỡng định trước (Threshold) để cảnh báo mức độ nguy hiểm.
 
-- Chưa nhận diện rõ ứng dụng
-- chưa sử dụng đồ thị viết tay
-- 
-có những luận văn làm rất tốt, nhưng chatgpt có thể thừa sức đánh bại luận văn đó, gây điểm thấp
-*/
+== Phương Pháp Tiếp Cận <phương-pháp-tiếp-cận>
+Hệ thống này sử dụng phương pháp MEDAVET (Traffic Vehicle Anomaly Detection Mechanism based on spatial and temporal structures in vehicle traffic), kết hợp với YOLOv7 để phát hiện và theo dõi các phương tiện trong video. Các phương pháp chính trong hệ thống bao gồm:
 
+1. *Phát hiện đối tượng với YOLOv7*: YOLOv7 (You Only Look Once version 7) được sử dụng để phát hiện các phương tiện trong các khung hình video. Đây là một mô hình học sâu có khả năng phát hiện đối tượng trong ảnh với tốc độ và độ chính xác cao.
 
+2. *Theo dõi hành trình phương tiện*: Sau khi phát hiện đối tượng, hệ thống sử dụng đồ thị để theo dõi hành trình của các phương tiện qua các khung hình liên tiếp. Mỗi phương tiện sẽ được theo dõi dựa trên các đặc trưng vị trí và chuyển động trong không gian và thời gian.
 
-// = View Synthesis using NeRF
-// Tổng hợp góc nhìn
+3. *Cấu trúc dữ liệu QuadTree*: QuadTree là một cấu trúc dữ liệu giúp tổ chức không gian trong video và phân tích hành vi của các phương tiện. Cấu trúc này giúp giảm thiểu độ phức tạp tính toán trong việc phân tích và theo dõi các phương tiện qua thời gian.
 
-// Từ một vài ảnh có góc nhìn hữu hạn, tạo thành một video với góc nhìn vô hạn 
+4. *Xác suất tai nạn*: Dựa trên hành vi của các phương tiện, hệ thống tính toán xác suất xảy ra tai nạn trong mỗi frame. Các yếu tố như tốc độ, khoảng cách giữa các phương tiện, và các bất thường trong hành vi di chuyển sẽ ảnh hưởng đến xác suất này.
 
-// - bao nhiêu góc? 
+== Nhận Xét <nhận-xét>
+- *Chưa giải thích cơ chế tìm chiều di chuyển và vận tốc của phương tiện*: Một yếu tố quan trọng trong việc tính toán xác suất tai nạn là việc xác định hướng di chuyển và vận tốc của các phương tiện. Việc này chưa được giải thích rõ ràng, mặc dù đó là yếu tố quan trọng trong việc dự đoán và cảnh báo tai nạn.
 
-// Neural Radiance Field
+- *Thiếu giải thích chung về hệ thống trước khi đi vào thuật toán và biểu đồ*: Các biểu đồ và thuật toán mô tả trong hệ thống cần phải được giải thích đầy đủ hơn về ý nghĩa và cách thức hoạt động của chúng trước khi đi sâu vào chi tiết. Cần phải có phần giải thích tổng quan về hệ thống trước khi thảo luận về các thuật toán cụ thể.
 
-// trong một không gian ảnh có điểm (x, y, z)
-// Hàm 5d trả ra color, density, qua đó render trên một mặt phẳng 2D.
+- *Cần giải thích rõ về dữ liệu không gian và thời gian (spatial-temporal)*: Việc xử lý dữ liệu không gian và thời gian là một thách thức lớn trong bài toán này. Cần nêu rõ các phương pháp được sử dụng để phân tích dữ liệu này, chẳng hạn như cách mà hệ thống theo dõi phương tiện qua không gian và thời gian, và cách tính toán sự bất thường trong hành vi giao thông.
 
-// hàm lỗi là độ 
+- *Cần hiểu rõ \"Thế nào là tai nạn?\"*: Để hệ thống có thể xác định chính xác thời điểm xảy ra tai nạn, cần có một định nghĩa rõ ràng về tai nạn. Điều này sẽ giúp xác định được chính xác khi nào hệ thống cần cảnh báo.
 
-// - bản chất là tạo ra ảnh mới, 
-// - ví dụ có 5 ảnh, cần tạo ảnh thứ 6 có view mới, từ góc alphabeta, thì lấy màu từ đâu? Có trước là tập hợp 
-// - Cần giải thich cụ thể về radiance
-// - Cần xem các biểu thức toán
-// - không rõ input output: với mỗi r(t), suy ra được c(r)
-// - Cần giải thích vì sao phải lấy nhiều điểm 
-// - $hat(C)$ ?
-// - positional encoding cần tính 1 feature vector có sự biến thiên cao?
-// - Hierarchical volume sampling
-// - coorse network vs fine network: không hiểu
-// - Hàm lỗi của mô hình: 
+- *Cần làm rõ đối tượng cần quan tâm trong mỗi frame*: Hệ thống cần chỉ rõ đối tượng nào cần được theo dõi và tính toán xác suất tai nạn trong mỗi frame. Liệu tất cả các phương tiện hay chỉ các phương tiện di chuyển không bình thường mới cần được tính toán xác suất tai nạn?
+
+- *Xử lý dữ liệu từ xe bị tai nạn*: Dữ liệu thu thập từ các xe đã bị tai nạn là rất quan trọng, nhưng cách thức gán nhãn cho dữ liệu này chưa được làm rõ. Cần phải giải thích quy trình gán nhãn cho các video hoặc dữ liệu giao thông để huấn luyện hệ thống.
+
+== Tổng Quan
+Hệ thống sử dụng YOLOv7 và cấu trúc dữ liệu QuadTree để phát hiện và theo dõi các phương tiện trong giao thông, đồng thời tính toán xác suất xảy ra tai nạn. Tuy nhiên, một số yếu tố như việc xác định vận tốc, chiều di chuyển của phương tiện, và cách gán nhãn cho dữ liệu cần được làm rõ để cải thiện độ chính xác và khả năng hoạt động của hệ thống trong thực tế. Việc hiểu rõ hơn về các bất thường trong hành vi giao thông và cách xác định tai nạn sẽ giúp hệ thống hoạt động hiệu quả hơn và có thể cảnh báo kịp thời.
 
 = BONE DISEASE VQA BASED ON MULTIMODAL TRANSFORMER
 
