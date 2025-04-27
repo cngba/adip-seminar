@@ -348,9 +348,81 @@ Dữ liệu được thu thập từ
 - Cách làm tương đối tốt, nhưng trình bày khó hiểu
 
 = ĐỊNH VỊ VÀ TÁI TẠO MÔI TRƯỜNG XUNG QUANH
+
+== Introduction
+Đối với một robot di động khám phá một môi trường tĩnh chưa biết, việc đ ịnh vị chính xác vị trí của
+nó đồng thời xây dựng bản đồ là một vấn đề "gà và trứng", được biết đến với tên gọi Định vị và xây
+dựng bản đồ đồng thời (Simultaneous Localization And Mapping).
+
+== Động lực nghiên cứu
+Khoa học: Để cải thiện khả năng nhận diện đặc trưng, theo dõi, và tái lập bản đồ trong điều kiện phức tạp (ánh sáng kém, chuyển động nhanh, cảnh lặp...).
+
+Trong nghiên cứu này, chúng ta sẽ xem xét cách xây dựng bản đồ 3D dựa trên mô hình đồ thị bằng cách:
++ Theo dõi các đặc trưng t hị giác như SIFT/SURK
++ Tính toán các phép biến đổi hình học với RANSA>
++ Áp dụng các kỹ t huật tối ưu phi tuyến để ước lượng quỹ đạo di chuyển.
+
 == Phát biểu bài toán
-Đầu vào: Hình ảnh từ Camera RGB-D
-Đầu ra: Mạng lưới 
+
+*Input: ${ f(t), D(t), (t = 1, ..., n) }$*
+
++ f(t) với tọa độ (x,y): là hình ảnh thông thường (RGB) được thu thập từ cảm biến màu của hệ thống. Với f(t), t đại diện cho thời gian hoặc số khung hình mà cảm biến thu thập tại thời điểm đó. Dữ liệu này chứa thông tin màu sắc của các đối tượng trong cảnh quan.
+
++ D(t): là dữ liệu độ sâu (depth data) thu được từ cảm biến RGB-D, chẳng hạn như Kinect. Dữ liệu này chứa thông tin về khoảng cách từ camera đến các đối tượng trong không gian.
+
+*Output: { Oxyz(t), Point cloud(t) (.ply)*
+
++ Oxyz(t): là vị trí 3D của camera hoặc robot tại thời điểm t, có thể biểu diễn dưới dạng một vector 3D, O(t) = Ox(t), Oy(t), Oz(t). Đây là tọa độ 3D của camera trong không gian.
+
++ Point cloud(t): liên quan đến 3D reconstruction, đại diện cho một tập hợp các điểm 3D trong không gian. Các point clouds là kết quả của việc định vị và xây dựng bản đồ. Khi camera di chuyển, mỗi khung hình tạo ra một point cloud mới, giúp xây dựng một bản đồ không gian 3D của môi trường.
+
+== Sợ đồ hệ thống:
+
+#image("photo/SLAM_system.png")
+
+== Phát Biểu Bài Toán <phát-biểu-bài-toán>
+Bài toán trong nghiên cứu này là về việc xây dựng hệ thống định vị và tạo bản đồ đồng thời (SLAM) cho robot hoặc xe tự hành sử dụng cảm biến RGB-D. Hệ thống này sử dụng dữ liệu ảnh màu (RGB) và dữ liệu độ sâu (depth) để xác định vị trí của robot và xây dựng bản đồ 3D của môi trường xung quanh. Cụ thể, bài toán đặt ra là làm sao để có thể xử lý dữ liệu hình ảnh từ các cảm biến RGB-D, từ đó ước lượng quỹ đạo di chuyển của robot, xác định vị trí của các đặc trưng trong môi trường, và xây dựng một bản đồ 3D chính xác trong thời gian thực.
+
+== Phương Pháp Tiếp Cận <phương-pháp-tiếp-cận>
+Để giải quyết bài toán này, hệ thống SLAM sử dụng các phương pháp nhận diện đặc trưng và khớp các điểm đặc trưng giữa các khung hình liên tiếp. Các đặc trưng này bao gồm những điểm đặc trưng mạnh mẽ được trích xuất từ hình ảnh sử dụng các thuật toán như SIFT (Scale-Invariant Feature Transform) và SURF (Speeded-Up Robust Features). Sau khi trích xuất đặc trưng, hệ thống sử dụng các phương pháp tối ưu hóa để tính toán phép biến đổi hình học giữa các khung hình và tạo ra bản đồ không gian 3D.
+
+== Cách Làm Chi Tiết <cách-làm-chi-tiết>
+Bài toán được giải quyết qua các bước sau:
+
++ #strong[Dữ Liệu Đầu Vào];: Hệ thống sử dụng hai loại dữ liệu chính:
+
+  - $f (t)$ là hình ảnh màu RGB thu được từ cảm biến tại thời điểm $t$. Đây là các khung hình mà cảm biến ghi nhận, chứa thông tin về màu sắc của các đối tượng trong cảnh.
+
+  - $D (t)$ là dữ liệu độ sâu thu được từ cảm biến RGB-D (ví dụ như Kinect), giúp xác định khoảng cách từ camera đến các đối tượng trong không gian.
+
++ #strong[Trích Xuất Đặc Trưng];: Các đặc trưng hình ảnh được trích xuất từ các khung hình sử dụng thuật toán SIFT hoặc SURF. Các đặc trưng này cho phép hệ thống nhận diện các điểm quan trọng trong môi trường và theo dõi chúng qua các khung hình khác nhau.
+
++ #strong[Khớp Các Đặc Trưng];: Sau khi trích xuất các đặc trưng, hệ thống sử dụng kỹ thuật khớp đặc trưng giữa các khung hình. Các điểm đặc trưng này sẽ được ghép nối thông qua phương pháp KD-tree, giúp tối ưu hóa quá trình tìm kiếm các cặp điểm tương ứng trong không gian đặc trưng.
+
++ #strong[Ước Lượng Biến Hình 3D];: Dựa trên các cặp điểm đã được khớp, hệ thống sẽ tính toán một phép biến hình 3D (bao gồm các phép quay và dịch chuyển) để chuyển đổi các điểm từ khung hình nguồn sang khung hình đích. Phép biến hình này được tính toán bằng phương pháp bình phương tối thiểu, giúp đảm bảo rằng các điểm khớp với độ chính xác cao.
+
++ #strong[Tạo Bản Đồ 3D];: Khi đã ước lượng được quỹ đạo di chuyển của camera, hệ thống tiếp tục tạo ra một bản đồ 3D của môi trường. Các point cloud được tạo ra từ dữ liệu RGB và độ sâu sẽ được kết hợp và đăng ký (registration) lại để tạo ra bản đồ không gian 3D hoàn chỉnh.
+
++ #strong[Tối Ưu Hóa Đồ Thị];: Các phép biến đổi giữa các khung hình được lưu trữ trong một đồ thị, trong đó mỗi nút đại diện cho một vị trí của camera (keypose). Các cạnh trong đồ thị biểu thị sự chuyển động giữa các vị trí này. Đồ thị sẽ được tối ưu hóa bằng phương pháp Levenberg-Marquardt để cải thiện độ chính xác của quỹ đạo và bản đồ.
+
+== Kết quả của bài toán là:
+- $O x y z (t)$: Vị trí 3D của camera hoặc robot tại thời điểm $t$, được biểu diễn dưới dạng vector 3D $O (t) = (O x (t) , O y (t) , O z (t))$.
+
+- Point cloud (t): Là bộ dữ liệu 3D thể hiện các điểm trong không gian, giúp tạo thành bản đồ 3D của môi trường xung quanh.
+
+Bài toán này không chỉ là vấn đề về định vị mà còn liên quan đến việc xây dựng bản đồ trong môi trường thực tế, giúp các robot có thể tự động di chuyển và nhận diện các đối tượng xung quanh một cách chính xác và hiệu quả.
+
+== Nhận xét
+
+Hệ thống SLAM sử dụng cảm biến RGB-D để giải quyết bài toán định vị và xây dựng bản đồ đồng thời đã thể hiện được tính hiệu quả trong môi trường thực tế. Phương pháp trích xuất và khớp đặc trưng sử dụng các thuật toán mạnh mẽ như SIFT và SURF đã cho phép hệ thống nhận diện và theo dõi các đối tượng trong môi trường với độ chính xác cao, ngay cả khi có sự thay đổi về góc nhìn và ánh sáng.
+
+Một điểm mạnh của hệ thống là khả năng sử dụng dữ liệu độ sâu từ cảm biến RGB-D để xác định chính xác vị trí 3D của camera hoặc robot trong không gian, đồng thời xây dựng bản đồ 3D của môi trường. Việc áp dụng phương pháp bình phương tối thiểu để ước lượng các phép biến hình cũng giúp cải thiện độ chính xác của các phép chuyển đổi giữa các khung hình.
+
+Tuy nhiên, hệ thống cũng còn một số hạn chế. Việc xử lý các point cloud trong môi trường có nhiều vật thể di động có thể gặp khó khăn do sự thay đổi nhanh chóng của các đặc trưng. Mặc dù phương pháp tối ưu hóa đồ thị giúp cải thiện quỹ đạo di chuyển và bản đồ, nhưng trong các tình huống phức tạp như môi trường đông đúc hoặc ánh sáng yếu, độ chính xác của hệ thống có thể giảm.
+
+Ngoài ra, việc xây dựng bản đồ 3D từ các point cloud yêu cầu một lượng tính toán lớn, điều này có thể gây khó khăn khi triển khai trên các hệ thống có tài nguyên tính toán hạn chế. Việc cải tiến hiệu suất và giảm độ trễ trong quá trình xử lý vẫn là một thách thức cần được giải quyết trong các nghiên cứu tiếp theo.
+
+Mặc dù vậy, phương pháp SLAM sử dụng cảm biến RGB-D này vẫn là một bước tiến quan trọng trong việc phát triển các hệ thống tự động hóa, đặc biệt trong các ứng dụng như robot di động, xe tự hành, và các hệ thống giám sát an ninh.
 
 // = Xây dựng hệ thống tính chỉ số hấp thụ các bon từ cây trồng dựa vào Thị giác máy tính và Trí tuệ nhân tạo
 = XÂY DỰNG HỆ THỐNG TÍNH CHỈ SỐ HẤP THỤ CÁC BON TỪ CÂY TRỒNG
