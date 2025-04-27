@@ -157,14 +157,26 @@ Object Regressor (Nhánh hồi quy toạ độ):
 
 // Detection
 
-= HỆ THỐNG TRUY VẾT ĐỐI TƯỢNG DỰA VÀO CÂU MÔ TẢ
+// = HỆ THỐNG TRUY VẾT ĐỐI TƯỢNG DỰA VÀO CÂU MÔ TẢ
+
 
 == Bối Cảnh Chung <bối-cảnh-chung>
 Hệ thống truy vết đối tượng dựa vào câu mô tả là một nhiệm vụ quan trọng trong lĩnh vực xử lý ảnh và video, đặc biệt trong các ứng dụng như xe tự hành, giao thông và an ninh. Việc theo dõi đối tượng trong môi trường phức tạp đối diện với các thách thức như:
 
 - Hạn chế ngôn ngữ mô tả
 
+// 1. GIỚI THIỆU
+// 1.1. BỐI CẢNH CHUNG
+// - xe tự hành, giao thông, an ninh
+
+// thách thức:
+// hạn chế ngôn ngữ
+// phân biệt đối tượng mục tiêu
+// theo vết trong điều kiện phức tạp
+
+
 - Phân biệt đối tượng mục tiêu
+
 
 - Truy vết trong điều kiện thay đổi môi trường và góc nhìn.
 
@@ -232,6 +244,51 @@ Bài toán đặt ra là phát hiện các bất thường trong giao thông b�
 
 - Dữ liệu từ các khung hình video, bao gồm hình ảnh và chuyển động của các phương tiện.
 
+// 2. PHÁT BIỂU BÀI TOÁN
+
+// 3. CÁC CÔNG TRÌNH LIÊN QUAN
+// phải nói rõ về cách thức theo vết đối tượng
+
+// - TP-GMOT: Tracking Generic Multiple Object by Textual Prompt with Motion Appearance Cost SORT
+
+// - DTLLM-VLT: 
+
+// tại 1 frame bất kỳ, có 2 trường hợp: 1 là đối tượng đang theo vết bị biến mất, 2 là đối tượng xuất hiện; khi đó câu mô tả phát huy như thế nào?
+
+// = PHÁT HIỆN BẤT THƯỜNG TRONG GIAO Thông
+
+// == Phát biểu bài toán
+// _Đầu vào:_ Một đoạn video từ camera hành trình / camera an ninh
+// _Đầu ra:_ Xác suất xảy ra tai nạn trong frame đang xét
+
+// Có xét Threshold là một ngưỡng cảnh báo mức độ nguy hiểm
+
+// == Phương pháp
+// MEDAVET: Traffic Vehicle Anomaly Detection Mechanism based on
+// spatial and temporal structures in vehicle traffic
+// - Dùng YOLOv7 để phát hiện đối tượng xe và dùng đồ thị nhằm theo dõi hành trình của các phương tiện thông qua khung hình của video.
+// - Sử dụng cấu trúc dữ liệu QuadTree để tổ chức không gian và phân tích hành vi của xe
+// == Nhận xét
+// - Chưa giải thích được cơ chế tìm chiều di chuyển và vận tốc của phương tiện
+// - Cần nói rõ ý chung trước khi đi sâu vào những biểu đồ và thuật toán, tuy có rất nhiều những neural network nhưng việc giải thích chưa đáng kể
+// - Xét dữ liệu không gian - thời gian (spatial - temporal) là một thách thức cần được nêu
+// - Cần hiểu "Thế nào là tai nạn?", như vậy mới xác định được chính xác thời điểm yêu cầu hệ thống hoạt động.
+// - Đối với mỗi frame, cần quan tâm đến object nào để tính toán ra xác suất?
+
+// $arrow.r$ liệt kê 11 vật thể nó quan tâm:
+
+// - từ hình ảnh, rút ra đối tượng ra sao, từ đối tượng rút ra xác suất thế nào?
+// - tại sao khi sắp có tai nạn thì xác suất được tăng lên?
+// Dùng YOLOv7 để phát hiện
+
+// - Dữ liệu đến từ những xe đã bị tai nạn, nhưng công tác gán nhãn diễn ra thế nào?
+
+// === Nhận xét
+/*
+= GRAPH OCR
+Nhận diện đồ thị bằng OCR
+
+
 #strong[Đầu ra];:
 
 - Xác suất tai nạn trong mỗi frame của video.
@@ -264,6 +321,7 @@ Hệ thống này sử dụng phương pháp MEDAVET (Traffic Vehicle Anomaly De
 
 == Tổng Quan
 Hệ thống sử dụng YOLOv7 và cấu trúc dữ liệu QuadTree để phát hiện và theo dõi các phương tiện trong giao thông, đồng thời tính toán xác suất xảy ra tai nạn. Tuy nhiên, một số yếu tố như việc xác định vận tốc, chiều di chuyển của phương tiện, và cách gán nhãn cho dữ liệu cần được làm rõ để cải thiện độ chính xác và khả năng hoạt động của hệ thống trong thực tế. Việc hiểu rõ hơn về các bất thường trong hành vi giao thông và cách xác định tai nạn sẽ giúp hệ thống hoạt động hiệu quả hơn và có thể cảnh báo kịp thời.
+
 
 = BONE DISEASE VQA BASED ON MULTIMODAL TRANSFORMER
 
@@ -346,9 +404,11 @@ Hệ thống không chỉ có ứng dụng trong việc cải thiện chất lư
 
 Tên ứng dụng: Giám sát thái độ học tập của sinh viên
 
+
 == Nhận xét:
 - Phương pháp sẽ chạy chậm vì áp dụng quá nhiều tác vụ khác nhau, gây tốn kém không cần thiết.
 - Cách làm tương đối tốt, nhưng trình bày khó hiểu
+
 
 = ĐỊNH VỊ VÀ TÁI TẠO MÔI TRƯỜNG XUNG QUANH
 
