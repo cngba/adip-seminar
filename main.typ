@@ -162,58 +162,58 @@ Object Regressor (Nhánh hồi quy toạ độ):
 
 // Detection
 
-= HỆ THỐNG TRUY VẾT ĐỐI TƯỢNG DỰA VÀO CÂU MÔ TẢ
+// = HỆ THỐNG TRUY VẾT ĐỐI TƯỢNG DỰA VÀO CÂU MÔ TẢ
 
-1. GIỚI THIỆU
-1.1. BỐI CẢNH CHUNG
-- xe tự hành, giao thông, an ninh
+// 1. GIỚI THIỆU
+// 1.1. BỐI CẢNH CHUNG
+// - xe tự hành, giao thông, an ninh
 
-thách thức:
-hạn chế ngôn ngữ
-phân biệt đối tượng mục tiêu
-theo vết trong điều kiện phức tạp
+// thách thức:
+// hạn chế ngôn ngữ
+// phân biệt đối tượng mục tiêu
+// theo vết trong điều kiện phức tạp
 
 
-2. PHÁT BIỂU BÀI TOÁN
+// 2. PHÁT BIỂU BÀI TOÁN
 
-3. CÁC CÔNG TRÌNH LIÊN QUAN
-phải nói rõ về cách thức theo vết đối tượng
+// 3. CÁC CÔNG TRÌNH LIÊN QUAN
+// phải nói rõ về cách thức theo vết đối tượng
 
-- TP-GMOT: Tracking Generic Multiple Object by Textual Prompt with Motion Appearance Cost SORT
+// - TP-GMOT: Tracking Generic Multiple Object by Textual Prompt with Motion Appearance Cost SORT
 
-- DTLLM-VLT: 
+// - DTLLM-VLT: 
 
-tại 1 frame bất kỳ, có 2 trường hợp: 1 là đối tượng đang theo vết bị biến mất, 2 là đối tượng xuất hiện; khi đó câu mô tả phát huy như thế nào?
+// tại 1 frame bất kỳ, có 2 trường hợp: 1 là đối tượng đang theo vết bị biến mất, 2 là đối tượng xuất hiện; khi đó câu mô tả phát huy như thế nào?
 
-= PHÁT HIỆN BẤT THƯỜNG TRONG GIAO Thông
+// = PHÁT HIỆN BẤT THƯỜNG TRONG GIAO Thông
 
-== Phát biểu bài toán
-_Đầu vào:_ Một đoạn video từ camera hành trình / camera an ninh
-_Đầu ra:_ Xác suất xảy ra tai nạn trong frame đang xét
+// == Phát biểu bài toán
+// _Đầu vào:_ Một đoạn video từ camera hành trình / camera an ninh
+// _Đầu ra:_ Xác suất xảy ra tai nạn trong frame đang xét
 
-Có xét Threshold là một ngưỡng cảnh báo mức độ nguy hiểm
+// Có xét Threshold là một ngưỡng cảnh báo mức độ nguy hiểm
 
-== Phương pháp
-MEDAVET: Traffic Vehicle Anomaly Detection Mechanism based on
-spatial and temporal structures in vehicle traffic
-- Dùng YOLOv7 để phát hiện đối tượng xe và dùng đồ thị nhằm theo dõi hành trình của các phương tiện thông qua khung hình của video.
-- Sử dụng cấu trúc dữ liệu QuadTree để tổ chức không gian và phân tích hành vi của xe
-== Nhận xét
-- Chưa giải thích được cơ chế tìm chiều di chuyển và vận tốc của phương tiện
-- Cần nói rõ ý chung trước khi đi sâu vào những biểu đồ và thuật toán, tuy có rất nhiều những neural network nhưng việc giải thích chưa đáng kể
-- Xét dữ liệu không gian - thời gian (spatial - temporal) là một thách thức cần được nêu
-- Cần hiểu "Thế nào là tai nạn?", như vậy mới xác định được chính xác thời điểm yêu cầu hệ thống hoạt động.
-- Đối với mỗi frame, cần quan tâm đến object nào để tính toán ra xác suất?
+// == Phương pháp
+// MEDAVET: Traffic Vehicle Anomaly Detection Mechanism based on
+// spatial and temporal structures in vehicle traffic
+// - Dùng YOLOv7 để phát hiện đối tượng xe và dùng đồ thị nhằm theo dõi hành trình của các phương tiện thông qua khung hình của video.
+// - Sử dụng cấu trúc dữ liệu QuadTree để tổ chức không gian và phân tích hành vi của xe
+// == Nhận xét
+// - Chưa giải thích được cơ chế tìm chiều di chuyển và vận tốc của phương tiện
+// - Cần nói rõ ý chung trước khi đi sâu vào những biểu đồ và thuật toán, tuy có rất nhiều những neural network nhưng việc giải thích chưa đáng kể
+// - Xét dữ liệu không gian - thời gian (spatial - temporal) là một thách thức cần được nêu
+// - Cần hiểu "Thế nào là tai nạn?", như vậy mới xác định được chính xác thời điểm yêu cầu hệ thống hoạt động.
+// - Đối với mỗi frame, cần quan tâm đến object nào để tính toán ra xác suất?
 
-$arrow.r$ liệt kê 11 vật thể nó quan tâm:
+// $arrow.r$ liệt kê 11 vật thể nó quan tâm:
 
-- từ hình ảnh, rút ra đối tượng ra sao, từ đối tượng rút ra xác suất thế nào?
-- tại sao khi sắp có tai nạn thì xác suất được tăng lên?
-Dùng YOLOv7 để phát hiện
+// - từ hình ảnh, rút ra đối tượng ra sao, từ đối tượng rút ra xác suất thế nào?
+// - tại sao khi sắp có tai nạn thì xác suất được tăng lên?
+// Dùng YOLOv7 để phát hiện
 
-- Dữ liệu đến từ những xe đã bị tai nạn, nhưng công tác gán nhãn diễn ra thế nào?
+// - Dữ liệu đến từ những xe đã bị tai nạn, nhưng công tác gán nhãn diễn ra thế nào?
 
-=== Nhận xét
+// === Nhận xét
 /*
 = GRAPH OCR
 Nhận diện đồ thị bằng OCR
@@ -252,60 +252,60 @@ có những luận văn làm rất tốt, nhưng chatgpt có thể thừa sức 
 // - coorse network vs fine network: không hiểu
 // - Hàm lỗi của mô hình: 
 
-= BONE DISEASE VQA BASED ON MULTIMODAL TRANSFORMER
+// = BONE DISEASE VQA BASED ON MULTIMODAL TRANSFORMER
 
-== Phương pháp
-Decoder:
-- Decoder giải mã và tìm cách liên kết với encoder
+// == Phương pháp
+// Decoder:
+// - Decoder giải mã và tìm cách liên kết với encoder
 
-Encoder:
-- Ảnh chụp y khoa được đưa vào Vision Encoder là SWIN
-- Câu hỏi của bác sĩ được đưa vào Text Encoder là ViHealthBERT
-- Kết quả của 2 encoder được đưa vào Fusion, gọi là CMAN.
-- Chuyển tiếp qua Decoder có Learnable Answer
-- MLP: có Sigmoid, Cross Entropy, AdamW (có weight decay để tránh làm ảnh hưởng đến Gradient khi loss thay đổi nhiều)
-- Output là Class ID.
+// Encoder:
+// - Ảnh chụp y khoa được đưa vào Vision Encoder là SWIN
+// - Câu hỏi của bác sĩ được đưa vào Text Encoder là ViHealthBERT
+// - Kết quả của 2 encoder được đưa vào Fusion, gọi là CMAN.
+// - Chuyển tiếp qua Decoder có Learnable Answer
+// - MLP: có Sigmoid, Cross Entropy, AdamW (có weight decay để tránh làm ảnh hưởng đến Gradient khi loss thay đổi nhiều)
+// - Output là Class ID.
 
-Vấn đề là cơ chế Generation tốn quá nhiều tài nguyên, nên chọn cơ chế Classification.
+// Vấn đề là cơ chế Generation tốn quá nhiều tài nguyên, nên chọn cơ chế Classification.
 
-Dataset kết hợp hình ảnh xét nghiệm và 
+// Dataset kết hợp hình ảnh xét nghiệm và 
 
-Training:
-- Giai đoạn 1: Train 6 epoch, trọng số không đổi
-- Giai đoạn 2: Train 3 epoch, có cho thay đổi trọng số
-Thời gian train là cho cả 2 giai đoạn là hơn 10 tiếng.
+// Training:
+// - Giai đoạn 1: Train 6 epoch, trọng số không đổi
+// - Giai đoạn 2: Train 3 epoch, có cho thay đổi trọng số
+// Thời gian train là cho cả 2 giai đoạn là hơn 10 tiếng.
 
-$arrow.r.double$  
-== Nhận xét
-- Cần chắt lọc dữ liệu lại, nếu dữ liệu y khoa quá lớn
-- Cần tự bổ sung thêm dữ liệu bằng cách đặt câu hỏi tương ứng.
-- Nên sắp xếp câu hỏi theo category: What?, Where?
-- Chưa giải thích rõ được cách đưa dữ liệu học vào mô hình: tức là 1 bảng, các cột là hình ảnh - câu hỏi - câu trả lời. Việc đưa raw data vào mô hình là vô lý.
-- Cần trình bày câu hỏi, kết quả theo từng nhóm bệnh 
+// $arrow.r.double$  
+// == Nhận xét
+// - Cần chắt lọc dữ liệu lại, nếu dữ liệu y khoa quá lớn
+// - Cần tự bổ sung thêm dữ liệu bằng cách đặt câu hỏi tương ứng.
+// - Nên sắp xếp câu hỏi theo category: What?, Where?
+// - Chưa giải thích rõ được cách đưa dữ liệu học vào mô hình: tức là 1 bảng, các cột là hình ảnh - câu hỏi - câu trả lời. Việc đưa raw data vào mô hình là vô lý.
+// - Cần trình bày câu hỏi, kết quả theo từng nhóm bệnh 
 
-= ĐIỂM DANH LỚP HỌC VÀ ĐÁNH GIÁ ĐƯỜNG CONG THÁI ĐỘ HỌC TẬP
-Tên ứng dụng: Giám sát thái độ học tập của sinh viên
-== Phát biểu bài toán
-Mục tiêu:
-- Tự động hoá điểm danh
-- Đánh giá thái độ học tập sinh viên, qua đó hiệu chỉnh kịp thời nội dung giảng dạy và phát hiện học sinh cá biệt.
+// = ĐIỂM DANH LỚP HỌC VÀ ĐÁNH GIÁ ĐƯỜNG CONG THÁI ĐỘ HỌC TẬP
+// Tên ứng dụng: Giám sát thái độ học tập của sinh viên
+// == Phát biểu bài toán
+// Mục tiêu:
+// - Tự động hoá điểm danh
+// - Đánh giá thái độ học tập sinh viên, qua đó hiệu chỉnh kịp thời nội dung giảng dạy và phát hiện học sinh cá biệt.
 
-Đầu vào: Dãy ảnh, video lớp học, từ camera. 
-Đầu ra: 
-- Bảng điểm danh tự động 
-- Đường cong thái độ học tập của từng sinh viên và của cả lớp. Đường cong này cũng được lưu giữ để phân tích xu hướng.  
-- Nguyên nhân tiêu cực
+// Đầu vào: Dãy ảnh, video lớp học, từ camera. 
+// Đầu ra: 
+// - Bảng điểm danh tự động 
+// - Đường cong thái độ học tập của từng sinh viên và của cả lớp. Đường cong này cũng được lưu giữ để phân tích xu hướng.  
+// - Nguyên nhân tiêu cực
 
-== Phương pháp:
-=== Phương pháp xây dựng phần mềm
-=== Công tác làm dữ liệu
-Dữ liệu được thu thập từ 
-=== Sơ đồ chung hệ thống
-=== Face Detection
-=== Face Recognition
-=== Face Emotion Recognition
-// Từ những gì bạn ghi được, chúng tôi có thể tái hiện (reproduceablity
-=== Action Reception
+// == Phương pháp:
+// === Phương pháp xây dựng phần mềm
+// === Công tác làm dữ liệu
+// Dữ liệu được thu thập từ 
+// === Sơ đồ chung hệ thống
+// === Face Detection
+// === Face Recognition
+// === Face Emotion Recognition
+// // Từ những gì bạn ghi được, chúng tôi có thể tái hiện (reproduceablity
+// === Action Reception
 
 // Cần nêu rõ input, output, dữ liệu
 
@@ -313,10 +313,10 @@ Dữ liệu được thu thập từ
 - Phương pháp sẽ chạy chậm vì áp dụng quá nhiều tác vụ khác nhau, gây tốn kém không cần thiết.
 - Cách làm tương đối tốt, nhưng trình bày khó hiểu
 
-= ĐỊNH VỊ VÀ TÁI TẠO MÔI TRƯỜNG XUNG QUANH
-== Phát biểu bài toán
-Đầu vào: Hình ảnh từ Camera RGB-D
-Đầu ra: Mạng lưới 
+// = ĐỊNH VỊ VÀ TÁI TẠO MÔI TRƯỜNG XUNG QUANH
+// == Phát biểu bài toán
+// Đầu vào: Hình ảnh từ Camera RGB-D
+// Đầu ra: Mạng lưới 
 
 // = Xây dựng hệ thống tính chỉ số hấp thụ các bon từ cây trồng dựa vào Thị giác máy tính và Trí tuệ nhân tạo
 = XÂY DỰNG HỆ THỐNG TÍNH CHỈ SỐ HẤP THỤ CÁC BON TỪ CÂY TRỒNG
