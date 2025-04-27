@@ -98,23 +98,69 @@ Nhược điểm:
   - Độ phức tạp tính toán cao
   - Hoạt động kém với sản phẩm có ít đặc trưng
 
+=== Deep Learning
+==== Trích xuất đặc trưng
+Darknet19 là backbone (mạng nền) dùng trong YOLOv2, gồm 19 lớp tích chập (Convolutional Layers) và 5 lớp pooling.
 
+Cách làm:
+- Bỏ lớp cuối cùng (lớp fully-connected và softmax dùng cho phân loại).
+- Dùng output của lớp convolution cuối cùng (hoặc trung gian) làm đặc trưng đầu ra.
+- Nếu cần, có thể áp dụng thêm Global Average Pooling (GAP) để biến tensor thành vector cố định.
+
+ResNet50 là mạng sâu 50 lớp, sử dụng các khối residual (các shortcut connections) để giải quyết vấn đề gradient biến mất trong mạng rất sâu.
+
+Cách làm:
+- Cắt bỏ lớp fully-connected cuối cùng (layer `fc` dùng cho phân loại ImageNet).
+- Lấy đầu ra tại phần Global Average Pooling (`avg_pool`) để làm vector đặc trưng.
+- Đầu ra là một vector 2048 chiều (vì ResNet50 sau pooling có 2048 channels).
+
+==== Đề xuất vùng
+===== *Anchor box* và *K-mean Clustering* (YOLOv2)
+- Thay vì dự đoán trực tiếp toạ độ bounding box như các phương pháp cũ, YOLOv2 sử dụng anchor boxes - các hộp có hình dạng/kích thước cố định làm mẫu dự đoán.
+- Các anchor boxes được tối ưu bằng thuật toán K-means Clustering trên tập dữ liệu huấn luyện, nhằm tìm ra các kích thước phổ biến của vật thể (hàng hóa) cần nhận diện.
+- Trong bài toán này, sử dụng 5 anchor boxes, đại diện cho 5 nhóm kích thước điển hình của các sản phẩm bán lẻ.
+
+_Các bước_:
+Mỗi ảnh đầu vào sẽ được chia thành một lưới $13 times 13$ ô.
+Tại mỗi ô lưới, mô hình dự đoán 5 bounding boxes, tương ứng với 5 anchor boxes đã xác định trước.
+
+Với mỗi bounding box, mô hình dự đoán:
+
+- Offsets: ($t_x$, $t_y$, $t_w$, $t_h$) - giá trị điều chỉnh (dịch chuyển và thay đổi kích thước) so với anchor box gốc.
+- Confidence score: Xác suất có vật thể nằm trong bounding box, đồng thời phản ánh độ chính xác (IoU) của dự đoán.
+
+===== Region Proposal Network
+Region Proposal Network - RPN là một mạng tích chập nhỏ được gắn trực tiếp lên trên backbone (mạng trích xuất đặc trưng), có nhiệm vụ tự động đề xuất các vùng có khả năng chứa vật thể.
+
+*Cấu trúc*
+
+RPN là một mạng chia làm 2 nhánh song song:
+
+Object Classifier (Nhánh phân loại nhị phân):
+- Phân loại mỗi anchor box thành 2 lớp: Object (có vật thể) hoặc Background (không có vật thể).
+- Output: Xác suất (score) thể hiện mức độ tin cậy vật thể có tồn tại ở vị trí anchor đó.
+
+Object Regressor (Nhánh hồi quy toạ độ):
+- Dự đoán chính xác hơn vị trí và kích thước của bounding box so với anchor ban đầu.
+- Dự đoán các giá trị dịch chuyển và tỉ lệ thay đổi: offsets ($t_x$, $t_y$, $t_w$, $t_h$) cho các anchor có điểm objectness cao.
+
+==== Object Recognition
 == Nhận xét
 - Nhóm vẫn chưa phát biểu được về cách thức phân loại trong những tình huống cụ thể, như phân biệt các sản phẩm cùng loại, khác nhãn hiệu (Coca-Cola với Pepsi, Sữa Vinamilk và sữa TH, ...)
-- Trong phần 2, nhóm không nêu rõ được mình sẽ mục tiêu thực hiện của công trình là gì,  
+- Trong phần 2, nhóm không nêu rõ được mình sẽ mục tiêu thực hiện của công trình là gì.
 
 
 
-(cần xếp thành category, cần có những tác vụ gì)
+// (cần xếp thành category, cần có những tác vụ gì)
 
 
-=== phương pháp dựa theo đặc trưng
-SIFT - scale invariant feature extraction
+// === phương pháp dựa theo đặc trưng
+// SIFT - scale invariant feature extraction
 
-=== Deep learning
-A deep learning pipeline for product recognition on store shelves
+// === Deep learning
+// A deep learning pipeline for product recognition on store shelves
 
-Detection
+// Detection
 
 = HỆ THỐNG TRUY VẾT ĐỐI TƯỢNG DỰA VÀO CÂU MÔ TẢ
 
@@ -139,12 +185,13 @@ phải nói rõ về cách thức theo vết đối tượng
 
 tại 1 frame bất kỳ, có 2 trường hợp: 1 là đối tượng đang theo vết bị biến mất, 2 là đối tượng xuất hiện; khi đó câu mô tả phát huy như thế nào?
 
-= Phát hiện bất thường trong giao thông
+= PHÁT HIỆN BẤT THƯỜNG TRONG GIAO Thông
 
 == Phát biểu bài toán
-- Input: một đoạn video từ camera hành trình / camera an ninh
-- Output: Xác suất xảy ra tai nạn trong frame đang xét
-- Threshold: Một ngưỡng cảnh báo mức độ nguy hiểm
+_Đầu vào:_ Một đoạn video từ camera hành trình / camera an ninh
+_Đầu ra:_ Xác suất xảy ra tai nạn trong frame đang xét
+
+Có xét Threshold là một ngưỡng cảnh báo mức độ nguy hiểm
 
 == Phương pháp
 MEDAVET: Traffic Vehicle Anomaly Detection Mechanism based on
@@ -176,31 +223,34 @@ Nhận diện đồ thị bằng OCR
 - 
 có những luận văn làm rất tốt, nhưng chatgpt có thể thừa sức đánh bại luận văn đó, gây điểm thấp
 */
-= View Synthesis using NeRF
-Tổng hợp góc nhìn
 
-Từ một vài ảnh có góc nhìn hữu hạn, tạo thành một video với góc nhìn vô hạn 
 
-- bao nhiêu góc? 
 
-Neural Radiance Field
+// = View Synthesis using NeRF
+// Tổng hợp góc nhìn
 
-trong một không gian ảnh có điểm (x, y, z)
-Hàm 5d trả ra color, density, qua đó render trên một mặt phẳng 2D.
+// Từ một vài ảnh có góc nhìn hữu hạn, tạo thành một video với góc nhìn vô hạn 
 
-hàm lỗi là độ 
+// - bao nhiêu góc? 
 
-- bản chất là tạo ra ảnh mới, 
-- ví dụ có 5 ảnh, cần tạo ảnh thứ 6 có view mới, từ góc alphabeta, thì lấy màu từ đâu? Có trước là tập hợp 
-- Cần giải thich cụ thể về radiance
-- Cần xem các biểu thức toán
-- không rõ input output: với mỗi r(t), suy ra được c(r)
-- Cần giải thích vì sao phải lấy nhiều điểm 
-- $hat(C)$ ?
-- positional encoding cần tính 1 feature vector có sự biến thiên cao?
-- Hierarchical volume sampling
-- coorse network vs fine network: không hiểu
-- Hàm lỗi của mô hình: 
+// Neural Radiance Field
+
+// trong một không gian ảnh có điểm (x, y, z)
+// Hàm 5d trả ra color, density, qua đó render trên một mặt phẳng 2D.
+
+// hàm lỗi là độ 
+
+// - bản chất là tạo ra ảnh mới, 
+// - ví dụ có 5 ảnh, cần tạo ảnh thứ 6 có view mới, từ góc alphabeta, thì lấy màu từ đâu? Có trước là tập hợp 
+// - Cần giải thich cụ thể về radiance
+// - Cần xem các biểu thức toán
+// - không rõ input output: với mỗi r(t), suy ra được c(r)
+// - Cần giải thích vì sao phải lấy nhiều điểm 
+// - $hat(C)$ ?
+// - positional encoding cần tính 1 feature vector có sự biến thiên cao?
+// - Hierarchical volume sampling
+// - coorse network vs fine network: không hiểu
+// - Hàm lỗi của mô hình: 
 
 = BONE DISEASE VQA BASED ON MULTIMODAL TRANSFORMER
 
