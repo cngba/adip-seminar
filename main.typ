@@ -216,29 +216,8 @@ Mô hình tổng thể của hệ thống bao gồm:
 == Kết Quả và Đánh Giá <kết-quả-và-đánh-giá>
 Hệ thống đã được huấn luyện và kiểm thử trên các bộ dữ liệu như LaSOT và WebUAV-3M. Các kết quả cho thấy mô hình đạt hiệu suất cao, đặc biệt trong việc xử lý các tác động từ lời nhắc ngôn ngữ mơ hồ. Các thí nghiệm cho thấy rằng phương pháp All-in-One giúp cải thiện độ chính xác trong việc theo dõi đối tượng trong các tình huống phức tạp.
 
-== Kết Luận <kết-luận>
+== Nhận xét
 Mô hình All-in-One Transformer kết hợp ngôn ngữ và hình ảnh một cách hiệu quả, đạt được kết quả vượt trội trong việc theo dõi đối tượng. Tuy nhiên, cần cải thiện khả năng xử lý các lời nhắc ngôn ngữ không chính xác hoặc mơ hồ để tăng cường tính chính xác và linh hoạt của hệ thống.
-
-1. GIỚI THIỆU
-1.1. BỐI CẢNH CHUNG
-- xe tự hành, giao thông, an ninh
-
-thách thức:
-hạn chế ngôn ngữ
-phân biệt đối tượng mục tiêu
-theo vết trong điều kiện phức tạp
-
-
-2. PHÁT BIỂU BÀI TOÁN
-
-3. CÁC CÔNG TRÌNH LIÊN QUAN
-phải nói rõ về cách thức theo vết đối tượng
-
-- TP-GMOT: Tracking Generic Multiple Object by Textual Prompt with Motion Appearance Cost SORT
-
-- DTLLM-VLT: 
-
-tại 1 frame bất kỳ, có 2 trường hợp: 1 là đối tượng đang theo vết bị biến mất, 2 là đối tượng xuất hiện; khi đó câu mô tả phát huy như thế nào?
 
 = PHÁT HIỆN BẤT THƯỜNG TRONG GIAO Thông
 
