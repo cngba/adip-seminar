@@ -318,30 +318,54 @@ $arrow.r.double$
 - Cần trình bày câu hỏi, kết quả theo từng nhóm bệnh 
 
 = ĐIỂM DANH LỚP HỌC VÀ ĐÁNH GIÁ ĐƯỜNG CONG THÁI ĐỘ HỌC TẬP
+
+== Phát Biểu Bài Toán <phát-biểu-bài-toán>
+=== Mục Tiêu <mục-tiêu>
+Mục tiêu của hệ thống là tự động hóa quá trình điểm danh và đánh giá thái độ học tập của sinh viên. Qua đó, giúp giảng viên có thể theo dõi tình trạng học tập của từng sinh viên và cả lớp, điều chỉnh nội dung giảng dạy kịp thời để cải thiện chất lượng học tập. Hệ thống sử dụng công nghệ nhận diện khuôn mặt và phân tích cảm xúc qua các video lớp học thu được từ camera.
+
+=== Đầu Vào và Đầu Ra <đầu-vào-và-đầu-ra>
+#strong[Đầu vào];: Dãy ảnh hoặc video từ camera giám sát lớp học.
+
+- Video lớp học ghi lại trong suốt quá trình giảng dạy.
+
+- Các hình ảnh có chứa khuôn mặt của sinh viên trong lớp.
+
+#strong[Đầu ra];:
+
+- Bảng điểm danh tự động.
+
+- Đường cong thái độ học tập của từng sinh viên và của toàn bộ lớp.
+
+- Lưu trữ và phân tích xu hướng thái độ học tập qua thời gian.
+
+- Phân tích nguyên nhân tiêu cực nếu có, giúp giảng viên nhận diện sinh viên có thái độ học tập không tích cực.
+
+== Phương Pháp Tiếp Cận <phương-pháp-tiếp-cận>
+Hệ thống này áp dụng các phương pháp xử lý ảnh số và AI, bao gồm các bước chính sau:
+
+1. *Face Detection (Phát hiện khuôn mặt)*: Sử dụng các thuật toán phát hiện khuôn mặt để nhận diện khuôn mặt của các sinh viên trong lớp học qua từng khung hình video. 
+2. *Face Recognition (Nhận diện khuôn mặt)*: Xác định và phân loại khuôn mặt của sinh viên dựa trên cơ sở dữ liệu có sẵn, để liên kết khuôn mặt với danh tính của từng sinh viên. 
+3. *Face Emotion Recognition (Nhận diện cảm xúc khuôn mặt)*: Phân tích các biểu cảm khuôn mặt của sinh viên, từ đó tính toán các giá trị Valence và Arousal, phản ánh mức độ tích cực, tiêu cực và mức độ hứng thú của sinh viên trong suốt buổi học. 
+4. *Action Reception (Nhận diện hành động)*: Phát hiện các hành động như giơ tay, đọc sách, sử dụng điện thoại, cúi đầu hoặc ngủ, giúp đánh giá mức độ tập trung của sinh viên trong lớp học.
+
+== Đường Cong Thái Độ Học Tập <đường-cong-thái-độ-học-tập>
+Sử dụng mô hình Valence-Arousal để xây dựng đường cong thái độ học tập của sinh viên:
+
+- *Valence*: Mức độ tích cực hoặc tiêu cực của cảm xúc.
+
+- *Arousal*: Mức độ kích thích hoặc mức độ tỉnh táo của cảm xúc.
+
+Đường cong thái độ học tập được tổng hợp từ các giá trị Valence và Arousal theo thời gian, giúp giảng viên đánh giá sự thay đổi trong thái độ học tập của sinh viên và có biện pháp điều chỉnh phù hợp.
+
+== Thách Thức <thách-thức>
+\- *Nhận diện khuôn mặt trong điều kiện phức tạp*: Các vấn đề như ánh sáng thay đổi, góc nhìn khác nhau hoặc khuôn mặt bị che khuất có thể gây khó khăn trong việc phát hiện chính xác khuôn mặt sinh viên. - *Phân tích cảm xúc chính xác*: Biểu cảm cảm xúc có thể đa dạng và tinh tế, và có thể có nhiều sinh viên cùng lúc, gây khó khăn trong việc phân tích chính xác. - *Xây dựng đường cong có ý nghĩa sư phạm*: Việc chuyển đổi dữ liệu cảm xúc thô thành thông tin hữu ích cho giảng viên để cải thiện phương pháp giảng dạy là một thách thức lớn.
+
+== Ý Nghĩa Ứng Dụng <ý-nghĩa-ứng-dụng>
+\- *Tự động hóa điểm danh* giúp tiết kiệm thời gian cho giảng viên và làm tăng tính chính xác trong việc ghi nhận sự có mặt của sinh viên. - *Đánh giá thái độ học tập* qua đường cong Valence-Arousal cung cấp dữ liệu khách quan giúp giảng viên điều chỉnh phương pháp giảng dạy theo tình trạng cảm xúc của sinh viên. - *Phát hiện sinh viên có thái độ tiêu cực* giúp giảng viên nhận diện sớm các vấn đề tâm lý của sinh viên, từ đó can thiệp kịp thời, hỗ trợ tư vấn tâm lý nếu cần.
+
+Hệ thống không chỉ có ứng dụng trong việc cải thiện chất lượng giảng dạy mà còn hỗ trợ các hoạt động tư vấn tâm lý, giúp phát hiện các dấu hiệu học sinh bị cô lập hoặc gặp vấn đề về cảm xúc.
+
 Tên ứng dụng: Giám sát thái độ học tập của sinh viên
-== Phát biểu bài toán
-Mục tiêu:
-- Tự động hoá điểm danh
-- Đánh giá thái độ học tập sinh viên, qua đó hiệu chỉnh kịp thời nội dung giảng dạy và phát hiện học sinh cá biệt.
-
-Đầu vào: Dãy ảnh, video lớp học, từ camera. 
-Đầu ra: 
-- Bảng điểm danh tự động 
-- Đường cong thái độ học tập của từng sinh viên và của cả lớp. Đường cong này cũng được lưu giữ để phân tích xu hướng.  
-- Nguyên nhân tiêu cực
-
-== Phương pháp:
-=== Phương pháp xây dựng phần mềm
-=== Công tác làm dữ liệu
-Dữ liệu được thu thập từ 
-=== Sơ đồ chung hệ thống
-=== Face Detection
-=== Face Recognition
-=== Face Emotion Recognition
-// Từ những gì bạn ghi được, chúng tôi có thể tái hiện (reproduceablity
-=== Action Reception
-
-// Cần nêu rõ input, output, dữ liệu
 
 == Nhận xét:
 - Phương pháp sẽ chạy chậm vì áp dụng quá nhiều tác vụ khác nhau, gây tốn kém không cần thiết.
