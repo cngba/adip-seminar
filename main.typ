@@ -64,11 +64,17 @@ Nhận diện hàng hoá bán lẻ là quá trình ứng dụng Thị giác máy
 Ví dụ là Amazon Go, mô hình cửa hàng không thu ngân, ứng dụng nhiều công nghệ hiện đại để nhận diện người dùng, tính tiền tự động theo đơn hàng.
 
 == Phát biểu bài toán 
-Đầu vào: 
+_Đầu vào:_ 
 - Ảnh hoặc Video của sản phẩm
 - Ảnh hoặc Video của kệ hàng
 
-Đầu ra: Thông tin sản phẩm, bao gồm vị trí trên kệ, tên sản phẩm, giá cả, hạn sử dụng, v.v.
+_Đầu ra:_ Thông tin sản phẩm, bao gồm vị trí trên kệ, tên sản phẩm, giá cả, hạn sử dụng, v.v.
+
+_Thách thức:_
+- Nhiều loại sản phẩm giống nhau
+- Nhiều sản phẩm khác loại vẫn có hình dạng giống nhau, gây khó khăn cho nhận diện
+- Dữ liệu ảnh: Ảnh tham chiếu chỉ có 1 hoặc rất ít ảnh chụp trong studio, nhưng ảnh thực tế chỉ được quay chụp bằng máy giá rẻ, không đảm bảo chuẩn.
+- Sản phẩm thay đổi thường xuyên theo thời gian, ứng với thay đổi về nhận diện
 
 == Phương pháp
 === Truyền thống
@@ -110,7 +116,7 @@ Cách làm:
 - Đầu ra là một vector 2048 chiều (vì ResNet50 sau pooling có 2048 channels).
 
 ==== Đề xuất vùng
-===== *Anchor box* và *K-mean Clustering* (YOLOv2)
+*Anchor box* và *K-mean Clustering* (YOLOv2)
 - Thay vì dự đoán trực tiếp toạ độ bounding box như các phương pháp cũ, YOLOv2 sử dụng anchor boxes - các hộp có hình dạng/kích thước cố định làm mẫu dự đoán.
 - Các anchor boxes được tối ưu bằng thuật toán K-means Clustering trên tập dữ liệu huấn luyện, nhằm tìm ra các kích thước phổ biến của vật thể (hàng hóa) cần nhận diện.
 - Trong bài toán này, sử dụng 5 anchor boxes, đại diện cho 5 nhóm kích thước điển hình của các sản phẩm bán lẻ.
@@ -124,12 +130,9 @@ Với mỗi bounding box, mô hình dự đoán:
 - Offsets: ($t_x$, $t_y$, $t_w$, $t_h$) - giá trị điều chỉnh (dịch chuyển và thay đổi kích thước) so với anchor box gốc.
 - Confidence score: Xác suất có vật thể nằm trong bounding box, đồng thời phản ánh độ chính xác (IoU) của dự đoán.
 
-===== Region Proposal Network
-Region Proposal Network - RPN là một mạng tích chập nhỏ được gắn trực tiếp lên trên backbone (mạng trích xuất đặc trưng), có nhiệm vụ tự động đề xuất các vùng có khả năng chứa vật thể.
+*Region Proposal Network* - RPN là một mạng tích chập nhỏ được gắn trực tiếp lên trên backbone (mạng trích xuất đặc trưng), có nhiệm vụ tự động đề xuất các vùng có khả năng chứa vật thể.
 
-*Cấu trúc*
-
-RPN là một mạng chia làm 2 nhánh song song:
+*Cấu trúc*: RPN là một mạng chia làm 2 nhánh song song:
 
 Object Classifier (Nhánh phân loại nhị phân):
 - Phân loại mỗi anchor box thành 2 lớp: Object (có vật thể) hoặc Background (không có vật thể).
@@ -140,44 +143,27 @@ Object Regressor (Nhánh hồi quy toạ độ):
 - Dự đoán các giá trị dịch chuyển và tỉ lệ thay đổi: offsets ($t_x$, $t_y$, $t_w$, $t_h$) cho các anchor có điểm objectness cao.
 
 ==== Object Recognition
+
+Trong bài toán nhận diện đối tượng cho sản phẩm bán lẻ, một bước quan trọng là biến đổi hình ảnh thành các vector đặc trưng (image embedding). Cụ thể, mỗi hình ảnh sản phẩm trong cơ sở dữ liệu sẽ được đưa qua một mô hình học sâu để chuyển thành một vector có kích thước cố định, gọi là embedding. Các vector embedding này đóng vai trò như Global Descriptors, đại diện cho những đặc điểm tổng thể của sản phẩm trong không gian đặc trưng, cho phép so sánh và phân loại các sản phẩm một cách hiệu quả.
+
+Khi cần tìm kiếm hoặc nhận diện một sản phẩm mới (hình ảnh truy vấn), hệ thống cũng sẽ biến đổi hình ảnh truy vấn đó thành một embedding tương ứng. Sau đó, phương pháp k-Nearest Neighbors (k-NN) được sử dụng để tìm kiếm. Đây là một chiến lược học có giám sát đơn giản nhưng hiệu quả, trong đó embedding của truy vấn sẽ được so sánh với tất cả các Global Descriptors đã lưu trữ, nhằm tìm ra k sản phẩm có embedding gần nhất dựa trên khoảng cách (thường là khoảng cách Euclidean hoặc cosine). Kết quả của bước này sẽ là danh sách các sản phẩm trong cơ sở dữ liệu có đặc trưng gần giống nhất với sản phẩm truy vấn.
+
+Để tạo ra các embedding chất lượng cao, hệ thống sử dụng một mô hình Convolutional Neural Network (CNN) dựa trên kiến trúc VGG16. VGG16 là một mạng nơ-ron sâu, nổi tiếng với cấu trúc đơn giản nhưng hiệu quả, bao gồm nhiều khối lớp tích chập (convolutional layers) xen kẽ với các lớp giảm kích thước (max pooling layers). Các lớp đầu tiên của mạng có nhiệm vụ trích xuất những đặc trưng hình học cơ bản như cạnh và góc, trong khi các lớp sâu hơn học được các đặc trưng phức tạp hơn như kết cấu, hình dạng và thành phần của sản phẩm. Sau cùng, các đặc trưng này được tổng hợp để tạo thành embedding đại diện cho hình ảnh.
+
+Nhờ quy trình kết hợp giữa embedding mạnh mẽ và tìm kiếm theo k-NN, hệ thống có thể nhận diện chính xác sản phẩm, ngay cả khi có sự khác biệt nhỏ về góc chụp, ánh sáng hoặc sự che khuất trong hình ảnh đầu vào.
+
 == Nhận xét
 - Nhóm vẫn chưa phát biểu được về cách thức phân loại trong những tình huống cụ thể, như phân biệt các sản phẩm cùng loại, khác nhãn hiệu (Coca-Cola với Pepsi, Sữa Vinamilk và sữa TH, ...)
 - Trong phần 2, nhóm không nêu rõ được mình sẽ mục tiêu thực hiện của công trình là gì.
+- Cần nêu rõ vì sao không sử dụng rút trích đặc trưng bằng YOLO luôn, để đơn giản hoá quy trình?
 
-
-
-// (cần xếp thành category, cần có những tác vụ gì)
-
-
-// === phương pháp dựa theo đặc trưng
-// SIFT - scale invariant feature extraction
-
-// === Deep learning
-// A deep learning pipeline for product recognition on store shelves
-
-// Detection
-
-// = HỆ THỐNG TRUY VẾT ĐỐI TƯỢNG DỰA VÀO CÂU MÔ TẢ
+= HỆ THỐNG TRUY VẾT ĐỐI TƯỢNG DỰA VÀO CÂU MÔ TẢ
 
 
 == Bối Cảnh Chung <bối-cảnh-chung>
 Hệ thống truy vết đối tượng dựa vào câu mô tả là một nhiệm vụ quan trọng trong lĩnh vực xử lý ảnh và video, đặc biệt trong các ứng dụng như xe tự hành, giao thông và an ninh. Việc theo dõi đối tượng trong môi trường phức tạp đối diện với các thách thức như:
-
 - Hạn chế ngôn ngữ mô tả
-
-// 1. GIỚI THIỆU
-// 1.1. BỐI CẢNH CHUNG
-// - xe tự hành, giao thông, an ninh
-
-// thách thức:
-// hạn chế ngôn ngữ
-// phân biệt đối tượng mục tiêu
-// theo vết trong điều kiện phức tạp
-
-
 - Phân biệt đối tượng mục tiêu
-
-
 - Truy vết trong điều kiện thay đổi môi trường và góc nhìn.
 
 == Phát Biểu Bài Toán <phát-biểu-bài-toán>
@@ -231,9 +217,10 @@ Hệ thống đã được huấn luyện và kiểm thử trên các bộ dữ 
 == Nhận xét
 Mô hình All-in-One Transformer kết hợp ngôn ngữ và hình ảnh một cách hiệu quả, đạt được kết quả vượt trội trong việc theo dõi đối tượng. Tuy nhiên, cần cải thiện khả năng xử lý các lời nhắc ngôn ngữ không chính xác hoặc mơ hồ để tăng cường tính chính xác và linh hoạt của hệ thống.
 
-= PHÁT HIỆN BẤT THƯỜNG TRONG GIAO Thông
+= PHÁT HIỆN BẤT THƯỜNG TRONG GIAO THÔNG
 
 == Phát Biểu Bài Toán <phát-biểu-bài-toán>
+
 === Mục Tiêu <mục-tiêu>
 Bài toán đặt ra là phát hiện các bất thường trong giao thông bằng cách phân tích video từ camera hành trình hoặc camera an ninh. Hệ thống mục tiêu là tính toán xác suất xảy ra tai nạn tại mỗi frame của video và cảnh báo mức độ nguy hiểm nếu vượt qua ngưỡng định trước. Việc xác định tai nạn và cảnh báo kịp thời là quan trọng để nâng cao hiệu quả giám sát và giảm thiểu tai nạn giao thông.
 
@@ -243,51 +230,6 @@ Bài toán đặt ra là phát hiện các bất thường trong giao thông b�
 - Video ghi lại cảnh giao thông từ một hoặc nhiều camera.
 
 - Dữ liệu từ các khung hình video, bao gồm hình ảnh và chuyển động của các phương tiện.
-
-// 2. PHÁT BIỂU BÀI TOÁN
-
-// 3. CÁC CÔNG TRÌNH LIÊN QUAN
-// phải nói rõ về cách thức theo vết đối tượng
-
-// - TP-GMOT: Tracking Generic Multiple Object by Textual Prompt with Motion Appearance Cost SORT
-
-// - DTLLM-VLT: 
-
-// tại 1 frame bất kỳ, có 2 trường hợp: 1 là đối tượng đang theo vết bị biến mất, 2 là đối tượng xuất hiện; khi đó câu mô tả phát huy như thế nào?
-
-// = PHÁT HIỆN BẤT THƯỜNG TRONG GIAO Thông
-
-// == Phát biểu bài toán
-// _Đầu vào:_ Một đoạn video từ camera hành trình / camera an ninh
-// _Đầu ra:_ Xác suất xảy ra tai nạn trong frame đang xét
-
-// Có xét Threshold là một ngưỡng cảnh báo mức độ nguy hiểm
-
-// == Phương pháp
-// MEDAVET: Traffic Vehicle Anomaly Detection Mechanism based on
-// spatial and temporal structures in vehicle traffic
-// - Dùng YOLOv7 để phát hiện đối tượng xe và dùng đồ thị nhằm theo dõi hành trình của các phương tiện thông qua khung hình của video.
-// - Sử dụng cấu trúc dữ liệu QuadTree để tổ chức không gian và phân tích hành vi của xe
-// == Nhận xét
-// - Chưa giải thích được cơ chế tìm chiều di chuyển và vận tốc của phương tiện
-// - Cần nói rõ ý chung trước khi đi sâu vào những biểu đồ và thuật toán, tuy có rất nhiều những neural network nhưng việc giải thích chưa đáng kể
-// - Xét dữ liệu không gian - thời gian (spatial - temporal) là một thách thức cần được nêu
-// - Cần hiểu "Thế nào là tai nạn?", như vậy mới xác định được chính xác thời điểm yêu cầu hệ thống hoạt động.
-// - Đối với mỗi frame, cần quan tâm đến object nào để tính toán ra xác suất?
-
-// $arrow.r$ liệt kê 11 vật thể nó quan tâm:
-
-// - từ hình ảnh, rút ra đối tượng ra sao, từ đối tượng rút ra xác suất thế nào?
-// - tại sao khi sắp có tai nạn thì xác suất được tăng lên?
-// Dùng YOLOv7 để phát hiện
-
-// - Dữ liệu đến từ những xe đã bị tai nạn, nhưng công tác gán nhãn diễn ra thế nào?
-
-// === Nhận xét
-/*
-= GRAPH OCR
-Nhận diện đồ thị bằng OCR
-
 
 #strong[Đầu ra];:
 
@@ -325,7 +267,94 @@ Hệ thống sử dụng YOLOv7 và cấu trúc dữ liệu QuadTree để phát
 
 = BONE DISEASE VQA BASED ON MULTIMODAL TRANSFORMER
 
-== Phương pháp
+== Giới thiệu
+Visual Question Answering (VQA) là một bài toán trong trí tuệ nhân tạo, yêu cầu mô hình trả lời một câu hỏi ngôn ngữ tự nhiên dựa trên nội dung của một hình ảnh đầu vào.
+
+#image("photo/vqa-1.png")
+
+*Multimodal Transformer là gì?*
+
+Sự phát triển mạnh mẽ của các mô hình Deep Learning trong những năm gần đây, đặc biệt là các kiến trúc như Convolutional Neural Networks (CNN), đã tạo nền tảng cho nhiều tiến bộ trong việc xử lý dữ liệu đa phương thức (Multimodal Learning - MML). Trên cơ sở đó, việc áp dụng kiến trúc Transformer vào các bài toán multimodal đang trở thành một hướng tiếp cận mới mẻ và đầy tiềm năng.
+
+Multimodal Transformer là mô hình có khả năng xử lý đồng thời nhiều loại dữ liệu khác nhau — chẳng hạn như hình ảnh, văn bản, âm thanh, video — bằng cách ánh xạ chúng vào cùng một không gian đặc trưng chung để học các mối liên hệ phức tạp giữa các modality. Điều này mở ra khả năng xây dựng các hệ thống thông minh có khả năng "hiểu" thế giới theo cách gần giống với con người, bằng cách kết hợp thông tin từ nhiều giác quan.
+
+Các loại dữ liệu multimodal phổ biến bao gồm: hình ảnh (image), giọng nói (voice), video và văn bản (text). Ngoài ra, còn có nhiều dạng dữ liệu khác cũng thường xuất hiện trong nghiên cứu và ứng dụng như đồ thị (graph), ngôn ngữ lập trình (programming language), đám mây điểm (point cloud), hình ảnh độ sâu (depth image) và hình ảnh quang học (optical image).
+
+== Phát biểu bài toán
+
+_Đầu vào_:
+- Ảnh chụp khớp xương: X-quang, MRI, CT
+- Kết quả lâm sàng: Mật độ xương, tuổi, bệnh lý nền
+- Câu hỏi của bác sĩ
+
+_Đầu ra_:
+- Kết quả chẩn đoán: Có gãy xương hay không? Viêm khớp mức độ? U xương?
+- Mô tả bệnh lý
+
+_Mô hình đề xuất_:
+
+#image("photo/vqa-mohinh.png")
+
+_Thách thức_:
+
+1. Chuyên môn
+- Dữ liệu y tế khó thu thập
+và không cân bằng.
+- Ngôn ngữ chuyên ngành.
+- Tính chính xác ảnh hưởng
+đến tính mạng bệnh nhân.
+
+2. Multimodal Transformer
+- Fusion giữa ảnh X-ray và
+câu hỏi ngôn ngữ
+- Semantic gap giữa hình ảnh
+y tế và ngôn ngữ tự nhiên
+- Học sự liên kết hình - ngữ
+(Cross-modal Alignment)
+
+3. Bệnh lý xương
+- Phân loại bệnh lý xương rất
+rộng.
+- Dấu hiệu tổn thương xương
+(nứt xương, viêm khớp...)
+thường có kích thước nhỏ,
+tương phản thấp, dễ bị bỏ
+qua bởi mô hình.
+
+== Công trình nghiên cứu liên quan
+=== TRANSFORMERS
+- Transformer truyền thống
+- Vision Transformer
+- Multimodal Transformer
+
+Multimodal Transformer gồm 4 công đoạn chính:
+- Tokenize input: Chia dữ liệu của từng modality (văn bản, hình ảnh, âm thanh) thành các token rời rạc
+- Embedding tokens (vectors): Chuyển đổi token sang vector số học trong không gian
+- Fusion: Gộp thông tin từ nhiều modality thành một biểu diễn dùng chung để suy luận.
+- Self-attention / Cross-attention: Áp dụng attention để
+trích xuất thông tin từ toàn bộ chuỗi token đa phương thức
+- Softmax
+
+Trong đó Fusion có: 
+- Early fusion: Gộp embedding trước khi
+đưa vào Transformer.
+- Late fusion: Transformer riêng từng
+modality, rồi gộp.
+- Cross-modal fusion: Dùng self-attention
+giữa các modality, ví dụ như trong
+ViLBERT, LXMERT, UNITER.
+
+=== MED-VQA BASE ON TRANSFORMER
+Giải quyêt bài toán: VQA trên dataset đã segment về võng mạc đái tháo đường
+
+Phương pháp tiếp cận gồm 2 hướng:
+- Fine-tuning model: Sử dụng tập data để fine-
+tuning
+- Greedy-soup model → Tìm bộ weights cuối
+cùng bằng các fusion 3 bộ trọng số tìm được
+của 3 fine-tuning models.
+
+== Thực nghiệm
 Decoder:
 - Decoder giải mã và tìm cách liên kết với encoder
 
@@ -339,7 +368,7 @@ Encoder:
 
 Vấn đề là cơ chế Generation tốn quá nhiều tài nguyên, nên chọn cơ chế Classification.
 
-Dataset kết hợp hình ảnh xét nghiệm và 
+Dataset kết hợp hình ảnh xét nghiệm và câu hỏi.
 
 Training:
 - Giai đoạn 1: Train 6 epoch, trọng số không đổi
@@ -350,7 +379,7 @@ $arrow.r.double$
 == Nhận xét
 - Cần chắt lọc dữ liệu lại, nếu dữ liệu y khoa quá lớn
 - Cần tự bổ sung thêm dữ liệu bằng cách đặt câu hỏi tương ứng.
-- Nên sắp xếp câu hỏi theo category: What?, Where?
+- Nên sắp xếp câu hỏi của bác sĩ theo category: What?, Where?
 - Chưa giải thích rõ được cách đưa dữ liệu học vào mô hình: tức là 1 bảng, các cột là hình ảnh - câu hỏi - câu trả lời. Việc đưa raw data vào mô hình là vô lý.
 - Cần trình bày câu hỏi, kết quả theo từng nhóm bệnh 
 
@@ -402,7 +431,7 @@ Sử dụng mô hình Valence-Arousal để xây dựng đường cong thái đ�
 
 Hệ thống không chỉ có ứng dụng trong việc cải thiện chất lượng giảng dạy mà còn hỗ trợ các hoạt động tư vấn tâm lý, giúp phát hiện các dấu hiệu học sinh bị cô lập hoặc gặp vấn đề về cảm xúc.
 
-Tên ứng dụng: Giám sát thái độ học tập của sinh viên
+// Tên ứng dụng: Giám sát thái độ học tập của sinh viên
 
 
 == Nhận xét:
@@ -439,7 +468,7 @@ Trong nghiên cứu này, chúng ta sẽ xem xét cách xây dựng bản đồ 
 
 + Point cloud(t): liên quan đến 3D reconstruction, đại diện cho một tập hợp các điểm 3D trong không gian. Các point clouds là kết quả của việc định vị và xây dựng bản đồ. Khi camera di chuyển, mỗi khung hình tạo ra một point cloud mới, giúp xây dựng một bản đồ không gian 3D của môi trường.
 
-== Sợ đồ hệ thống:
+== Sơ đồ hệ thống
 
 #image("photo/SLAM_system.png")
 
@@ -470,7 +499,6 @@ Bài toán được giải quyết qua các bước sau:
 
 == Kết quả của bài toán là:
 - $O x y z (t)$: Vị trí 3D của camera hoặc robot tại thời điểm $t$, được biểu diễn dưới dạng vector 3D $O (t) = (O x (t) , O y (t) , O z (t))$.
-
 - Point cloud (t): Là bộ dữ liệu 3D thể hiện các điểm trong không gian, giúp tạo thành bản đồ 3D của môi trường xung quanh.
 
 Bài toán này không chỉ là vấn đề về định vị mà còn liên quan đến việc xây dựng bản đồ trong môi trường thực tế, giúp các robot có thể tự động di chuyển và nhận diện các đối tượng xung quanh một cách chính xác và hiệu quả.
@@ -550,3 +578,198 @@ Phương pháp Chỉ số thực vật NDVI:
 - Sử dụng Dataset Landsat 5/7
 - Ưu điểm: Dễ áp dụng, không cần khảo sát thực địa
 - Nhược điểm: Độ chính xác thấp ở rừng nhiệt đới, bị ảnh hưởng bởi đất trống.
+
+= Bone Disease Diagnosis based on Multimodal Deep Learning
+
+== Giới thiệu
+
+Bệnh loãng xương là bệnh diễn biến âm thầm, chỉ biểu hiện khi có
+biến chứng:
+- Đau xương, đau lưng 
+- Biến dạng cột sống 
+- Đau ngực, khó thở 
+- Gãy xương
+
+Triệu chứng cận lâm sàng: 
+- X-quang quy ước: hình ảnh đốt sống tăng thấu
+quang
+- Đo khối lượng xương (BMD) bằng phương pháp
+đo hấp phụ tia X năng lượng kép (Dual Energy
+Xray Absorptiometry - DXA)
+- CT Scan hoặc MRI có thể được sử dụng để
+đánh giá khối lượng xương
+
+Các yếu tố tiên lương:
+Tiên lượng là dự đoán về diễn biến và kết quả của một
+bệnh lý dựa trên các yếu tố liên quan.
+- Nếu bệnh có tiên lượng tốt, nghĩa là khả năng hồi phục
+cao, ít biến chứng.
+- Nếu bệnh có tiên lượng xấu, nghĩa là có nguy cơ diễn
+biến nặng, gây biến chứng hoặc khó điều trị.
+
+=== Ý nghĩa khoa học
++ Tăng cường hiểu biết về bệnh loãng xương: Loãng xương ảnh hưởng đến các cấu trúc khác nhau của cột sống thắt lưng như thế nào
++ Mở rộng ứng dụng của học sâu đa phương thức
++ Phát triển mô hình học sâu
+
+=== Ý nghĩa ứng dụng
++ Chẩn đoán sớm và chính xác hơn
++ Tận dụng hình ảnh sẵn có
++ Hỗ trợ cho các y bác sĩ
++ Cá nhân hoá điều trị
+
+== Phát biểu bài toán
+Chẩn đoán mức độ loãng xương của một cá nhân thông qua
+các thông tin lâm sàng và cận lâm sàng của bệnh nhân đó
+
+_Đầu vào_:
+- Dữ liệu cận lâm sàng (ảnh CT, MRI)
+- Dữ liệu lâm sàng (BMI, chiều cao, tuổi, giới tính, ...)
+
+_Đầu ra_:
+Tỉ lệ của các mức độ loãng xương theo chẩn đoán của WHO (xương bình
+thường, thiếu xương, loãng xương và loãng xương nặng)
+
+_Thách thức_:
+- Việc thu thập và chia sẻ dữ liệu y tế có thể gặp khó khăn do các vấn đề về quyền riêng tư và các quy định
+- Dữ liệu hình ảnh y tế có thể khác nhau giữa các cơ sở y tế và máy quét khác nhau
+- Mô hình cần phải tự diễn giải được dự đoán được đưa ra
+- Cần phải được kiểm định lâm sàng chặt chẽ
+
+_Mục tiêu_:
+- Đưa ra giải pháp chẩn đoán loãng xương tự động thay thế cho phương pháp DXA.
+- Đưa ra giải pháp học sâu kết hợp các phương thức dữ liệu ảnh và text để chẩn đoán bệnh loãng xương.
+
+_Mục đích_:
+- Giúp giảm khối lượng công việc cho các y bác sĩ, nâng cao hiệu suất làm việc.
+- Giúp chẩn đoán loãng xương chính xác hơn.
+
+== Phương pháp
+=== Deep learning for screening primary osteopenia and osteoporosis using spine radiographs and patient clinical covariates in a Chinese population
+
+#image("photo/mdl-mohinh.png")
+
+*Mô tả*:
+- Xây dựng một mô hình học sâu (deep learning) dựa
+trên ảnh X-quang cột sống thắt lưng (lumbar spine) để
+sàng lọc thiếu xương và loãng xương.
+- So sánh hiệu suất chẩn đoán của mô hình chỉ sử dụng
+ảnh X-quang với mô hình kết hợp thêm các thông tin
+lâm sàng (tuổi, giới tính, BMI).
+
+*Dữ liệu*:
+- Dữ liệu: 6,908 bệnh nhân (bao gồm cả phụ nữ sau mãn
+kinh và nam giới từ 50-95 tuổi) được thu thập từ nhiều
+trung tâm y tế. Tất cả bệnh nhân đều được chụp X-quang
+cột sống thắt lưng và đo BMD (mật độ xương) bằng DXA
+trong vòng 3 tháng.
+- Chia dữ liệu: Dữ liệu được chia thành 1 tập huấn luyện, 1
+tập kiểm định, và 2 tập kiểm tra, tỉ lệ 8:1:1:1 (khác với %).
+- Tiền xử lí: Các vùng quan tâm (ROI) trên ảnh X-quang
+được xác định và cắt ra, sau đó được chuẩn hóa kích thước
+và giá trị pixel để tăng độ ổn định của mô hình.
+
+*Kiến trúc mô hình*:
+
+_Đầu vào:_ Ảnh X-quang cột sống thắt lưng (cả ảnh anteroposterior - AP và lateral - LAT) và các thông tin lâm sàng (tuổi, giới tính, BMI).
+
+_Mô hình:_ Sử dụng mạng nơ-ron tích chập CNN với kiến trúc DenseNet.
+- DenseNet: Gồm 4 khối dense block và 3 lớp chuyển tiếp (transition layers). Truyền tải đặc trưng, tăng cường biểu diễn đặc trưng, giảm số
+lượng tham số, tăng đa dạng đặc trưng, đầu ra là một vector đặc trưng. 
+
+Cấu trúc như sau:
+- Dense block bao gồm các lớp batch normalization để chuẩn hóa đầu vào phù hợp, hàm kích hoạt ReLU (Rectified Linear Unit), và
+convolution 3x3 để trích suất đặc trưng.
+- Lớp chuyển tiếp (Transition layer) dùng để giảm kích thước không gian của bản đồ đặc trưng.
+- Kết hợp thông số lâm sàng: Các thông số lâm sàn (tuổi, giới tính, BMI) được thêm vào vector đặc trưng sau khi trích suất đặc trưng ảnh qua
+fusion model, sau đó được xử lí và trích xuất thêm thông tin qua lớp convolution và Fully connected, kết quả dự đoán được trả qua lớp
+softmax.
+
+_Đầu ra:_ Mô hình phân loại bệnh nhân vào 3 nhóm: bình thường, thiếu xương (osteopenia), và loãng xương (osteoporosis).
+
+*Loss Function*:
+Categorical Cross-entropy: Đo lường sự khác biệt giữa phân phối thực tế $p$ và phân phối dự đoán $q$. Giá trị càng thấp cho thấy hai phân phối càng gần nhau.
+
+$
+  H(p,q) = - Sigma p(x) log q(x) 
+$
+- Phân phối xác suất thực tế ($p$): Đại diện cho phân phối thực sự của dữ liệu, thường
+được mã hóa one-hot trong các bài toán phân loại (ví dụ: $[1, 0, 0]$ cho lớp 1).
+- Phân phối xác suất dự đoán ($q$): Xác suất do mô hình đưa ra cho từng lớp (ví dụ: $[0.7, 0.2, 0.1]$).
+
+=== Prediction of osteoporosis using MRI and CT scans with unimodal and multimodal deep-learning models
+
+- Nghiên cứu này đề xuất các mô hình CNN đơn phương thức
+(unimodal) và đa phương thức (multimodal) để dự đoán
+loãng xương từ ảnh MRI và CT phần thắt lưng.
+- Mục tiêu chính là so sánh hiệu quả của các mô hình đơn
+phương thức (chỉ sử dụng MRI hoặc CT) với mô hình đa
+phương thức (kết hợp cả MRI và CT) trong việc dự đoán loãng
+xương.
+
+*Dữ liệu*:
+- Ảnh MRI: 535 ảnh MRI T1-weighted sagittal từ 62 bệnh nhân.
+- Ảnh CT: 562 ảnh CT sagittal reformatted từ 50 bệnh nhân.
+- Dữ liệu DEXA: Chỉ số mật độ xương (BMD) từ 246 bệnh nhân
+được sử dụng làm nhãn (label) để huấn luyện mô hình.
+- Nhóm đối chứng: 58 bệnh nhân MRI và 50 bệnh nhân CT
+không bị loãng xương.
+- Tập kiểm tra độc lập (Hold-out Test Set): 116 ảnh (48 MRI và
+68 CT) được tách riêng để kiểm tra mô hình.
+
+Mô hình CNN được thiết kế với kiến trúc khối kép song song (Dual blocks).
+
+1. Đầu vào (Input)
+Ảnh CT ($80 times 60$) và Ảnh MRI ($80 times 60$) được đưa vào hai nhánh xử lý riêng.
+
+2. Giai đoạn đơn phương thức (Unimodal Phase)
+Mỗi loại ảnh được xử lý qua hai khối CNN song song:
+Block 1 (Cam):
+- Hai lớp Conv2D với 32 bộ lọc ($3 times 3$).
+- Kích hoạt ReLU + chuẩn hóa BatchNorm.
+- Áp dụng max-pooling ($2 times 2$) để giảm kích thước.
+
+Block 2 (Xanh Dương):
+- Hai lớp Conv2D với 32 bộ lọc ($5 times 5$).
+- Kích hoạt ReLU + chuẩn hóa BatchNorm.
+- Giảm kích thước bằng stride = 2 thay vì max-pooling.
+
+Sau đó, đặc trưng từ hai khối được tổng hợp bằng pixel-wise addition và qua một lớp Conv2D (64 bộ lọc, $5 times 5$, stride $1 times 1$) để trích xuất đặc trưng cuối cùng.
+
+3. Output - Hợp nhất hai nguồn ảnh (CT & MRI)
+Đặc trưng của hai nhánh được làm phẳng (Flatten Layer) và đưa vào hai lớp
+Fully Connected:
+- Lớp 1: 32 neurons.
+- Lớp 2: 16 neurons.
+Sau đó, hai nhánh được hợp nhất để tạo đầu ra L3.
+
+ĐÁNH GIÁ MÔ HÌNH (5 chỉ số đánh giá)
+- Độ đặc hiệu (Specificity): Đánh giá khả năng mô hình dự đoán đúng các mẫu âm tính (negative cases)
+$
+  "Specificity" = frac("TN", "TN + FP")
+$
+
+- Độ nhạy (Sensitivity): Đánh giá khả năng mô hình dự đoán đúng các mẫu
+dương tính (positive cases).
+$
+  "Sensitivity" = frac("TP", "TP + FN")
+$
+
+- Độ chính xác (Accuracy): Thể hiện tỷ lệ dự đoán đúng của mô hình so với
+tổng số mẫu.
+$
+  "Accuracy" = frac("TP" + "TN", "TP" + "TN" + "FP" + "FN" )
+$
+
+ROC AUC score: Đánh giá khả năng phân biệt giữa hai lớp.
+- ROC (Receiver Operating Characteristic): Đường cong thể hiện mối quan
+hệ giữa độ nhạy (Sensitivity) và 1 - độ đặc hiệu (1 - Specificity).
+- AUC (Area Under Curve): Diện tích dưới đường cong ROC, giá trị càng
+cao thì mô hình phân loại càng tốt.
+
+Balanced accuracy: Trung bình cộng của độ
+nhạy và độ đặc hiệu, giúp loại bỏ ảnh hưởng
+của kích thước tập dữ liệu khác nhau.
+$
+  "Balanced Accuracy" = frac("Sensitivity" + "Specificity", 2)
+$
